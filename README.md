@@ -1,2 +1,2 @@
 # Cshell
-For ECS 150, Fal 2018. 
+For ECS 150, Fall 2018. 
