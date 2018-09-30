@@ -1,0 +1,4 @@
+For the definitions of the functions
+https://en.wikipedia.org/wiki/Read_(system_call)
+https://en.wikipedia.org/wiki/Open_(system_call)
+https://en.wikipedia.org/wiki/Write_(system_call)
