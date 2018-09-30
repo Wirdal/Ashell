@@ -4,10 +4,13 @@ void AshellPrint(char* output){
 //TODO
 };
 
-char* AshellRead(const char* path){
+size_t AshellRead(int fd, void *buf, size_t count){
 //TODO
 };
 
+int AshellOpen(const char *path, int flags, .../*, mode_t mode*/){
+//TODO
+};
 // Shell commands
 
 
