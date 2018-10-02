@@ -17,7 +17,8 @@ int main (int argc, char *argv[]) {
 	while (1){
 		read(0, &input, 1); 
 		if (isprint(input)){
-			std::cout << input;
+			std::cout << "This is what comes out " << input << "\n";
+
 		};
 	};
 }
