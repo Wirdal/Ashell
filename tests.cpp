@@ -16,9 +16,11 @@ int main (int argc, char *argv[]) {
 	char input;
 	while (1){
 		read(0, &input, 1); 
-		if (isprint(input)){
+		if (isprint(input)){ //We read one byte at a time
 			std::cout << "This is what comes out " << input << "\n";
-
-		};
-	};
+		}
+		else if ("0\\") { //The end of a string will be this thing
+			std::cout << "Nothing left \n"; //As in, when it reads, this is the end
+		}
+	}
 }
