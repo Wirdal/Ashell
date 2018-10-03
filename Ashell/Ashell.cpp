@@ -2,7 +2,6 @@
 #include <cstring>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <iostream>
 #include <unistd.h>
 void AshellPrint(const char* output){
 //Write to 0 for STDIN_FILENO

@@ -15,7 +15,7 @@ Probaby will be more here, but define implemetnation here first
 int AshellOpen(const char *path, int flags, .../*, mode_t mode*/);
 
 //
-void AshellPrint(char* output);
+void AshellPrint(const char* output);
 
 //FD, is the handle returned by open
 //Buf, the buffer where the read data is stored to
