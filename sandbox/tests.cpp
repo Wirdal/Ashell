@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <unistd.h>
+using namespace std;
 int main (int argc, char *argv[]) {
 	/* How to write to a file. generally
 	 int fd;
@@ -13,14 +14,7 @@ int main (int argc, char *argv[]) {
 	// Needs to correclty deal with arrow keys and backspaces
 
 	// This should be outputting whatever gets typed in
-	char input;
-	while (1){
-		read(0, &input, 1); 
-		if (isprint(input)){ //We read one byte at a time
-			std::cout << "This is what comes out " << input << "\n";
-		}
-		else if ("0\\") { //The end of a string will be this thing
-			std::cout << "Nothing left \n"; //As in, when it reads, this is the end
-		}
-	}
+	const char *input = "Hello Hello";
+	std::string input;
+
 }
