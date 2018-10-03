@@ -2,3 +2,7 @@ For the definitions of the functions
 https://en.wikipedia.org/wiki/Read_(system_call)
 https://en.wikipedia.org/wiki/Open_(system_call)
 https://en.wikipedia.org/wiki/Write_(system_call)
+https://linux.die.net/man/2/write
+
+For CPP tutorials
+https://www.tutorialspoint.com/cplusplus/cpp_overloading.htm
