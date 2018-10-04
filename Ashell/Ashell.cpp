@@ -20,10 +20,12 @@ void AshellPrint(const char* output){
     };
 };
 void AshellPrint(std::string output){
+    //I can't think of a better way to do this
     const char* output2 = output.c_str();
 	AshellPrint(output2);
 };
 void AshellPrint(int output){
+    // It all just waterfalls down
     std::string out2 = std::to_string(output);
     AshellPrint(out2);
 };

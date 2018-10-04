@@ -3,8 +3,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <typeinfo>
+#include <string>
+
+
 using namespace std;
 void AshellPrint(const char* output){
+// As of now, we can only print out strings
 //Write to 0 for STDIN_FILENO
 //Write to 1 fir STDOUT_FILENO
 //Write to 2 for STDERR_FILENO
@@ -19,19 +24,6 @@ void AshellPrint(const char* output){
     };
 };
 int main (int argc, char *argv[]) {
-	/* How to write to a file. generally
-	 int fd;
-	 const char path[10] = "tests.cpp";
-	 fd = open(path ,O_WRONLY); //Opening for write only
-	 std::cout << fd << "Hello!";
-	*/
-	// The main loop. Should just be reading inputs, then parsing after an enter
-	// Needs to correclty deal with arrow keys and backspaces
-
-	// This should be outputting whatever gets typed i
-	AshellPrint("Test 1\n");
-	AshellPrint("Test 2\n");
-	AshellPrint("123\n");
-	AshellPrint("file\\file2\\exe");
-
+	char* out;
+	getcwd(out, 0);
 }
