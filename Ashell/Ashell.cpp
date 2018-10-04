@@ -41,8 +41,10 @@ int AshellOpen(const char *path, int flags, .../*, mode_t mode*/){
 // Shell commands
 
 
-char* pwd(){
-//TODO
+void pwd(){
+	char *path = get_current_dir_name();
+	AshellPrint(path);
+	free(path);
 };
 
 void exit(){

@@ -26,7 +26,7 @@ size_t AshellRead(int fd, void *buf, size_t count); //Maybe will need more?
 // Shell commands
 
 
-char* pwd(); // May need a path arguement
+void pwd(); // May need a path arguement
 
 void exit();
 
