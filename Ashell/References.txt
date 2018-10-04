@@ -2,7 +2,11 @@ For the definitions of the functions
 https://en.wikipedia.org/wiki/Read_(system_call)
 https://en.wikipedia.org/wiki/Open_(system_call)
 https://en.wikipedia.org/wiki/Write_(system_call)
+
+References used in Ashellprint
+https://stackoverflow.com/questions/347949/how-to-convert-a-stdstring-to-const-char-or-char
 https://linux.die.net/man/2/write
+
 
 For CPP tutorials
 https://www.tutorialspoint.com/cplusplus/cpp_overloading.htm
