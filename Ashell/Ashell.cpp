@@ -1,8 +1,10 @@
 // I/O services
 #include <cstring>
+#include <string>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+
 void AshellPrint(const char* output){
 //Write to 0 for STDIN_FILENO
 //Write to 1 fir STDOUT_FILENO
@@ -15,7 +17,15 @@ void AshellPrint(const char* output){
 		int current = write(1, output, 1);
         written = written + current;
 		output = output + current;
-    }
+    };
+};
+void AshellPrint(std::string output){
+    const char* output2 = output.c_str();
+	AshellPrint(output2);
+};
+void AshellPrint(int output){
+    std::string out2 = std::to_string(output);
+    AshellPrint(out2);
 };
 void AshellPrint(const int* output){
     int size = sizeof(output);
