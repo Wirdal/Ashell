@@ -1,6 +1,6 @@
 #ifndef ASHELL_H
 #define ASHELL_H
-
+#include <string>
 /*
 This file is meant to go over the implementation for Ashell.
 Probaby will be more here, but define implemetnation here first
