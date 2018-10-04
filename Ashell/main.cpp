@@ -1,4 +1,5 @@
 #include "Ashell.hh"
+#include <unistd.h>
 int main (int argc, char *argv[]) {
   //Main loops goes here
   //While true

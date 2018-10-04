@@ -12,7 +12,7 @@ void AshellPrint(const char* output){
 //We're gonna write to 1, so we can print to the console
     //Find how much we need to write
 	int size = strlen(output);
-    int written = 0;
+  int written = 0;
     while(size != written){
 		int current = write(1, output, 1);
         written = written + current;
@@ -45,6 +45,7 @@ void pwd(){
 	char *path = get_current_dir_name();
 	AshellPrint(path);
 	free(path);
+	AshellPrint("\n");
 };
 
 void exit(){
