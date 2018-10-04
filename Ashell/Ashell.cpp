@@ -49,7 +49,7 @@ void pwd(){
 };
 
 void exit(){
-//TODO
+    exit(EXIT_SUCCESS);
 };
 
 void cd(char* directory){
