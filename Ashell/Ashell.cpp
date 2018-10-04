@@ -27,13 +27,7 @@ void AshellPrint(int output){
     std::string out2 = std::to_string(output);
     AshellPrint(out2);
 };
-void AshellPrint(const int* output){
-    int size = sizeof(output);
-    int written = 0;
-    while(size != written){
-        written = written - write(1, output, 1);
-    }
-};
+
 
 size_t AshellRead(int fd, void *buf, size_t count){
 //TODO
