@@ -21,13 +21,11 @@ void AshellPrint(const char* output){
 };
 void AshellPrint(std::string output){
     //I can't think of a better way to do this
-    const char* output2 = output.c_str();
-	AshellPrint(output2);
+	AshellPrint(output.c_str());
 };
 void AshellPrint(int output){
-    // It all just waterfalls down
     std::string out2 = std::to_string(output);
-    AshellPrint(out2);
+    AshellPrint(out2.c_str());
 };
 
 
@@ -52,10 +50,20 @@ void exit(){
     exit(EXIT_SUCCESS);
 };
 
-void cd(char* directory){
-//TODO
-}; //Will need to deal with the HOME with a default var
+void cd(const char* directory){
+    int err = chdir(directory);
+    if (-1 == err){
+     AshellPrint("Error changing directory \n");
+    }
+};
+void cd(std::string directory){
+    const char* cdirectory = directory.c_str();
+    int err = chdir(cdirectory);
+    if (-1 == err){
+     AshellPrint("Error changing directory \n");
 
+    }
+};
 char* ls(char* directory){
 //TODO
 };
