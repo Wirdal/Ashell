@@ -26,20 +26,23 @@ void parse(char *prog, char **parsed){
     int i = 0;
     char split_memory[110];
     char *split = split_memory;
+    char *prog_copy = prog; //We don't want strtok to affect our program
 
     //http://www.cplusplus.com/reference/cstring/strtok/
-    split = strtok(prog, " ");
+    split = strtok(prog_copy, " ");
 
     while (split != NULL){
         std::cout << "i: " << i << " split: " << split<<"\n";
         parsed[i] = split;
+        //Not sure what split is at this point, null?
         split = strtok(NULL, " ");
         ++i;
     }
 
+    std::cout << "Finished parse" << "\n";
+    std::cout << "POST SPLIT: prog: " << prog << " parsed: " << *parsed << "\n";
+    //std::cout << "split: " << split[0] << "\n"; //won't print
 
-    std::cout << "POST SPLIT: prog: " << prog << " parsed: " << *parsed << " split: " << *split<< "\n";
-    std::cout << "parsed[0]: " << parsed[0];
 
 
 }
@@ -113,6 +116,7 @@ int main(int argc, char *argv[]) {
     }
     std::cout <<"prog:  " << prog << "    args:   " << args<< "\n";
     parse(prog,&args);
+    std::cout <<"prog:  " << prog << "    args:   " << args<< "\n";
 
 
 
