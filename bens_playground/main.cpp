@@ -28,7 +28,7 @@ void CallPrograms(char **seperated, int num_args){
 }
 
 void parse(char *prog, char **parsed){
-    std::cout <<"got to parse" << "\n";
+    //std::cout <<"got to parse" << "\n";
     //Parsing char array received, basically a split line function.
     //Currently seperates with ' ' TODO work with any character
 
@@ -43,7 +43,7 @@ void parse(char *prog, char **parsed){
 
     while (split != NULL){
         seperated[i] = split;
-        std::cout <<"seperated[" << i << "] "<< seperated[i] << "\n";
+        //std::cout <<"seperated[" << i << "] "<< seperated[i] << "\n";
         parsed[i] = split;
         //Not sure what split becomes
         split = strtok(NULL, " ");
@@ -55,8 +55,8 @@ void parse(char *prog, char **parsed){
     char * run_program = seperated[0];
     int num_args = i -1;
 
-    std::cout <<"Run Program: " << run_program<<"\n";
-    std::cout <<"Number of Args: " << num_args<<"\n";
+    //std::cout <<"Run Program: " << run_program<<"\n";
+    //std::cout <<"Number of Args: " << num_args<<"\n";
 
 
     CallPrograms(seperated, num_args);
@@ -125,9 +125,9 @@ void ReadAndParseCmd() {
         i++;
 
     }
-    std::cout <<"prog:  " << prog << "    args:   " << args<< "\n\n";
+    //std::cout <<"prog:  " << prog << "    args:   " << args<< "\n\n";
     parse(prog,&args);
-    std::cout <<"Done."<< "\n";
+    //std::cout <<"Done."<< "\n";
 
 
 
