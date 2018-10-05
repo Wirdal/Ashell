@@ -36,8 +36,6 @@ int main(int argc, char *argv[]) {
         }
 
 
-        //std::cout <<"i: " << i << "\n";
-
         i++;
 
     }
