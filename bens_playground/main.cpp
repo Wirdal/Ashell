@@ -23,12 +23,20 @@ void parse(char *prog, char *parsed){
 
     char *input;
     int i = 0;
-    int space_loc = 0;
+    int split_loc = 0;
     int num_spaces = 0;
     char command[5];
-    char argument[514];
-    //char** arg_list = new char*[100]; //100 should be the num of possible arrays
+    char argument[10];
 
+    int max_num_split = 10; //TODO: make this dynamically allocating
+    char arg_list[12];
+
+    /*
+    char** arg_list = new char*[max_num_split]; //max_num_split should be the num of possible arrays
+    for(int j = 0; j < max_num_split ; ++j){
+        arg_list[j] = new char[10];
+    }
+    */
 
     input = prog;
 
@@ -36,32 +44,44 @@ void parse(char *prog, char *parsed){
 
     while(input[i] != '\0'){
         //If a space is found
+        std::cout << "i: " << i  << "\n";
         if(input[i] == splitter){
+            //num_spaces=num_spaces + 1; BUG: this results in num_spaces = 25965 on third iteration
+            //maybe running out of memory
+            split_loc=i;
             num_spaces++;
-            space_loc=i;
+            std::cout << "Arg List at num_spaces = " << num_spaces << ": " << "\n";
 
-            //if this is the first space found
-            if(num_spaces == 1){
-                for(int a = 0; a < i; ++a){
-                    command[a] = input[a];
-                    //std::cout << "put in command: "<< input[a] << "\n";
-                }
-                command[i] = '\0';
+            for(int a = 0; a < i; ++a){
+                std::cout << "a: " << a << " < i: " << i << "\n";
+                command[a] = input[a];
+                //std::cout << "put in command: "<< input[a] << "\n";
             }
+            //for 2D array
+            //arg_list[num_spaces] = command;
+            std::cout << "numspaces: " << num_spaces << "\n";
+            arg_list[num_spaces] = command[0];
 
+            std::cout << "Arg List at num_spaces = " << num_spaces << ": " << arg_list[num_spaces] << "\n";
+
+
+
+            command[i] = '\0';
         }
+
+
         if(input[i+1] == '\0'){
-            for(int a = 0; a < i - space_loc; ++a){
-                argument[a] = input[a + space_loc + 1];
+            for(int a = 0; a < i - split_loc; ++a){
+                argument[a] = input[a + split_loc + 1];
                 argument[a + 1] = '\0';
 
             }
+
             argument[i+1] = '\0';
 
         }
 
-        //std::cout << "input at i:  "<< input[i] << "\n";
-        i ++;
+        i++;
 
 
     }
@@ -70,7 +90,7 @@ void parse(char *prog, char *parsed){
     std::cout << "Arg: "<< argument << "\n";
 
     //Return parsed arrays
-    std::cout << "returned array: " << parsed<< "\n";
+    std::cout << "returned array: " << parsed << "\n";
 
 
 }
@@ -84,16 +104,16 @@ int main(int argc, char *argv[]) {
     int max_size = 512;  //TODO: switch to buffer or malloc system if necessary
     int i = 0;
 
-    char test_array[] = "12345678";
+    char test_array[100] = "12345678";
 
-    std::cout <<"size of '" << test_array << "' : " <<  size_of(test_array) << "\n";
+    //std::cout <<"size of '" << test_array << "' : " <<  size_of(test_array) << "\n";
 
     size_t bytes_read = 0;
 
     //if you do this it creates in_one in read-only memory, can't change
     //char *in_one = "one-";
-    char test_prog[] = "cd home";
-    char test_parsed[] = "arg1 arg2 arg3";
+    char test_prog[100] = "cd home now";
+    char test_parsed[100] = "arg1 arg2 arg3 arg4";
 
 
     parse(test_prog, test_parsed);
