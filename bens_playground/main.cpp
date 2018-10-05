@@ -2,6 +2,20 @@
 #include <iostream>
 #include <unistd.h>
 
+
+
+
+void parse(char *prog, char *args){
+
+    std::cout <<"test_prog before: "<< prog << "\n";
+    prog[3] = '4';
+    //std::cout <<"test_prog after: "<< prog << "\n";
+
+}
+
+
+
+
 int main(int argc, char *argv[]) {
 
     bool end_line = false;
@@ -11,7 +25,19 @@ int main(int argc, char *argv[]) {
 
     size_t bytes_read = 0;
 
-    char char_read = NULL;\
+    //if you do this it creates in_one in read-only memory, can't change
+    //char *in_one = "one-";
+    char test_prog[] = "cd go home";
+    char test_args[] = "arg1 arg2 arg3";
+
+
+    parse(test_prog, test_args);
+
+    std::cout <<"test prog after: " << test_prog << "\n";
+    std::cout <<"test args after: " << test_args << "\n";
+    //std::cout <<"parse: " << parsed_char << "\n";
+
+    char char_read = NULL;
     char prog[max_size]; //the program contains all input
     char ** args = NULL; //the arguments are the pieces of the program, seperated by space
 
@@ -20,7 +46,7 @@ int main(int argc, char *argv[]) {
 
     while (!end_line){
         //bytes_read is the number of bytes SUCCESSFULLY read
-        //Example: if "Benjamin" is typed with max_bytes being 10, 9 is returned.
+        //Example: if "Ben" is typed with max_bytes being 10, 4 is returned.
         bytes_read = read(fd_read, &char_read, max_bytes);
 
 
