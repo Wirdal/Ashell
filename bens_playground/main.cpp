@@ -11,30 +11,34 @@ int main(int argc, char *argv[]) {
 
     size_t bytes_read = 0;
 
-    char prog_print = NULL;\
-    char prog[max_size];
-    char ** args = NULL; //points to a set of pointers of char arrays
-    char command[10];
+    char char_read = NULL;\
+    char prog[max_size]; //the program contains all input
+    char ** args = NULL; //the arguments are the pieces of the program, seperated by space
 
     int max_bytes = 1; //reads at most 1 byte at a time
     int fd_read = 0; //this if the fd (file descriptior) for read
 
     while (!end_line){
         //bytes_read is the number of bytes SUCCESSFULLY read
-        //
-        bytes_read = read(fd_read, &prog_print, max_bytes);
+        //Example: if "Benjamin" is typed with max_bytes being 10, 9 is returned.
+        bytes_read = read(fd_read, &char_read, max_bytes);
 
-        if (isprint(prog_print)){
-            std::cout <<"this comes out: " << prog_print << "\n";
-            prog[i] = prog_print;
+
+        //if the input is
+        if (isprint(char_read)){
+            //std::cout <<"this comes out: " << prog_print << "\n";
+            prog[i] = char_read;
         }
 
         else if ("0\\") {
             end_line = true;
+            //always a null character at the end of the string
             prog[i] = '\0';
             //std::cout << "now at the end of the string \n";
         }
 
+
+        //std::cout <<"i: " << i << "\n";
 
         i++;
 
