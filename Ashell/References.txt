@@ -10,5 +10,9 @@ https://linux.die.net/man/2/write
 References in exit
 http://man7.org/linux/man-pages/man3/exit.3.html
 
+References in cd
+https://linux.die.net/man/2/chdir
+
 For CPP tutorials
 https://www.tutorialspoint.com/cplusplus/cpp_overloading.htm
+https://www.geeksforgeeks.org/char-vs-stdstring-vs-char-c/
