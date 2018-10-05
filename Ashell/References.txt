@@ -16,3 +16,9 @@ https://linux.die.net/man/2/chdir
 For CPP tutorials
 https://www.tutorialspoint.com/cplusplus/cpp_overloading.htm
 https://www.geeksforgeeks.org/char-vs-stdstring-vs-char-c/
+
+References in Parse
+http://www.cplusplus.com/reference/cstring/strtok/
+
+For Shell explanations
+Operating System Principles & Practices Second Edition (Thomas Anderson and Michael Dahlin)
