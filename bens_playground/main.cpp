@@ -21,27 +21,34 @@ void parse(char *prog, char **parsed){
 
     //Parsing char array received, basically a split line function, in progress
 
+
+
+
+
+
     std::cout << "Call parse: " << "\n";
     std::cout << "PRE SPLIT: prog: " << prog << " parsed: " << *parsed<< "\n";
     int i = 0;
     char split_memory[110];
+
     char *split = split_memory;
-    char *prog_copy = prog; //We don't want strtok to affect our program
+    char * seperated[15];
 
     //http://www.cplusplus.com/reference/cstring/strtok/
-    split = strtok(prog_copy, " ");
+    split = strtok(prog, " ");
 
     while (split != NULL){
-        std::cout << "i: " << i << " split: " << split<<"\n";
+        //std::cout << "i: " << i << " split: " << split<<"\n";
+        seperated[i] = split;
+        std::cout <<"seperated[" << i << "] "<< seperated[i] << "\n";
         parsed[i] = split;
-        //Not sure what split is at this point, null?
+        //Not sure what st does at this time, seems to change split to null?
         split = strtok(NULL, " ");
         ++i;
     }
 
-    std::cout << "Finished parse" << "\n";
-    std::cout << "POST SPLIT: prog: " << prog << " parsed: " << *parsed << "\n";
-    //std::cout << "split: " << split[0] << "\n"; //won't print
+
+ 
 
 
 
@@ -72,6 +79,8 @@ int main(int argc, char *argv[]) {
     //std::cout <<"test prog after: " << test_prog << "\n";
     //std::cout <<"test args after: " << test_parsed << "\n";
     //std::cout <<"parsed: " << parsed_char << "\n";
+
+
 
     char char_read = NULL;
     char * prog; //the program contains all input
