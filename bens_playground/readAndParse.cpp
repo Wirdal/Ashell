@@ -20,7 +20,31 @@ int size_of(char *array){
 void CallPrograms(char **seperated, int num_args){
 
     char * run_program = seperated[0];
-    std::cout <<"Call Program " << run_program<< " with " << num_args << " arguments"<<"\n";
+    //std::cout <<"Call Program " << run_program<< " with " << run_program[2] << " arguments"<<"\n";
+
+
+
+    if(run_program[0] == 'c' && run_program[1] == 'd' && run_program[2] == '\0'){
+        std::cout <<"Execute CD "<<"\n";
+    }
+    else if(run_program[0] == 'l' && run_program[1] == 's' && run_program[2] == '\0'){
+        std::cout <<"Execute LS "<<"\n";
+    }
+    else if(run_program[0] == 'p' && run_program[1] == 'w' && run_program[2] == 'd' && run_program[3] == '\0'){
+        std::cout <<"Execute PWD "<<"\n";
+    }
+    else if(run_program[0] == 'e' && run_program[1] == 'x' && run_program[2] == 'i' && run_program[3] == 't' && run_program[4] == '\0'){
+        std::cout <<"Execute EXIT "<<"\n";
+    }
+    else if(run_program[0] == 'f' && run_program[1] == 'f' && run_program[2] == '\0'){
+        std::cout <<"Execute ff "<<"\n";
+        char * filename = seperated[1];
+        std::cout <<"Filename:  "<< filename <<"\n";
+    }
+    else{
+        std::cout <<"Run Exec(" << run_program<<");" <<"\n";
+    }
+
 
 }
 
@@ -46,6 +70,7 @@ void parse(char *prog, char **parsed){
         split = strtok(NULL, " ");
         ++i;
     }
+    seperated[i] = split;
 
     std::cout << "\n\n";
 
@@ -82,11 +107,12 @@ void ReadAndParseCmd() {
     //char *in_one = "one-";
 
     char prog_mem[100] = "12345678";
+    char args_mem[100] = "12345678";
 
-    char char_read = NULL;
+    char char_read = '\0';
     char * prog = prog_mem; //the program contains all input
     char * parsed; //to contain parsed input
-    char *args = ""; //Input after the command/program
+    char *args = args_mem; //Input after the command/program
 
     int max_bytes = 1; //reads at most 1 byte at a time
     int fd_read = 0; //this if the fd (file descriptor) for read
