@@ -4,7 +4,11 @@
 
 #include <stdio.h>
 #include <string.h>
+bool readAndParse(char &program, char &arguments){
 
+
+
+}
 int size_of(char *array){
     int i = 0;
 
@@ -18,7 +22,7 @@ int size_of(char *array){
 
 
 void parse(char *prog, char **parsed){
-
+    std::cout <<"got to parse" << "\n";
     //Parsing char array received, basically a split line function.
     //Currently seperates with ' ' TODO work with any character
 
@@ -60,8 +64,8 @@ void parse(char *prog, char **parsed){
 
 
 
-int main(int argc, char *argv[]) {
-
+void run() {
+    std::cout <<"got to run" << "\n";
     bool end_line = false;
     int max_size = 512;  //TODO: switch to buffer or malloc system if necessary
     int i = 0;
@@ -73,33 +77,41 @@ int main(int argc, char *argv[]) {
     //if you do this it creates in_one in read-only memory, can't change
     //char *in_one = "one-";
 
+    char prog_mem[100] = "12345678";
 
     char char_read = NULL;
-    char * prog; //the program contains all input
+    char * prog = prog_mem; //the program contains all input
     char * parsed; //to contain parsed input
     char *args = ""; //Input after the command/program
 
     int max_bytes = 1; //reads at most 1 byte at a time
     int fd_read = 0; //this if the fd (file descriptor) for read
 
+
+
     while (!end_line){
         //bytes_read is the number of bytes SUCCESSFULLY read
         //Example: if "Ben" is typed with max_bytes being 10, 4 is returned.
+        //std::cout <<"got to while" << "\n";
         bytes_read = read(fd_read, &char_read, max_bytes);
 
 
         //if the input is readable
         if (isprint(char_read)){
-            //std::cout <<"this comes out: " << prog_print << "\n";
+            //std::cout <<"got to if" << "\n";
+            //std::cout <<"got to if" << "\n";
+            //std::cout <<"this comes out: " << prog << "\n";
             prog[i] = char_read;
         }
 
         else if ("0\\") {
+            //std::cout <<"got to end line" << "\n";
             end_line = true;
             //always a null character at the end of the string
             prog[i] = '\0';
 
         }
+        //std::cout <<"out of if" << "\n";
 
 
 
@@ -114,4 +126,8 @@ int main(int argc, char *argv[]) {
 
 
 
+}
+
+int main(int argc, char *argv[]) {
+    run();
 }
