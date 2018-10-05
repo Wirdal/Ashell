@@ -1,14 +1,11 @@
 #include <fcntl.h>
 #include <iostream>
 #include <unistd.h>
-
 #include <stdio.h>
 #include <string.h>
-bool readAndParse(char &program, char &arguments){
 
 
 
-}
 int size_of(char *array){
     int i = 0;
 
