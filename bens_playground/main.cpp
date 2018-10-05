@@ -19,37 +19,40 @@ int size_of(char *array){
 
 void parse(char *prog, char **parsed){
 
-    //Parsing char array received, basically a split line function, in progress
+    //Parsing char array received, basically a split line function.
+    //Currently seperates with ' ' TODO work with any character
 
 
-
-
-
-
-    std::cout << "Call parse: " << "\n";
-    std::cout << "PRE SPLIT: prog: " << prog << " parsed: " << *parsed<< "\n";
     int i = 0;
     char split_memory[110];
-
-    char *split = split_memory;
+    char * split = split_memory;
     char * seperated[15];
 
     //http://www.cplusplus.com/reference/cstring/strtok/
     split = strtok(prog, " ");
 
     while (split != NULL){
-        //std::cout << "i: " << i << " split: " << split<<"\n";
         seperated[i] = split;
         std::cout <<"seperated[" << i << "] "<< seperated[i] << "\n";
         parsed[i] = split;
-        //Not sure what st does at this time, seems to change split to null?
+        //Not sure what split becomes
         split = strtok(NULL, " ");
         ++i;
     }
 
+    std::cout << "\n\n";
 
- 
+    char * run_program = seperated[0];
+    int num_args = i -1;
 
+    std::cout <<"Run Program: " << run_program<<"\n";
+    std::cout <<"Number of Args: " << num_args<<"\n";
+
+
+
+    //SWITCH run_program == "cd"
+    //SWITCH run_program == "ls"
+    //SWITCH run_program == "pwd"
 
 
 }
@@ -65,36 +68,19 @@ int main(int argc, char *argv[]) {
 
     char test_array[100] = "12345678";
 
-    //std::cout <<"size of '" << test_array << "' : " <<  size_of(test_array) << "\n";
-
     size_t bytes_read = 0;
 
     //if you do this it creates in_one in read-only memory, can't change
     //char *in_one = "one-";
 
 
-
-
-
-    //std::cout <<"test prog after: " << test_prog << "\n";
-    //std::cout <<"test args after: " << test_parsed << "\n";
-    //std::cout <<"parsed: " << parsed_char << "\n";
-
-
-
     char char_read = NULL;
     char * prog; //the program contains all input
-    char * parsed; //the program contains all input
-
-    //char args[max_size];
-    char *args = "hello";
-
-    //char * args;
-
-    //char ** args = NULL; //the arguments are the pieces of the program, seperated by space
+    char * parsed; //to contain parsed input
+    char *args = ""; //Input after the command/program
 
     int max_bytes = 1; //reads at most 1 byte at a time
-    int fd_read = 0; //this if the fd (file descriptior) for read
+    int fd_read = 0; //this if the fd (file descriptor) for read
 
     while (!end_line){
         //bytes_read is the number of bytes SUCCESSFULLY read
@@ -102,7 +88,7 @@ int main(int argc, char *argv[]) {
         bytes_read = read(fd_read, &char_read, max_bytes);
 
 
-        //if the input is
+        //if the input is readable
         if (isprint(char_read)){
             //std::cout <<"this comes out: " << prog_print << "\n";
             prog[i] = char_read;
@@ -113,19 +99,17 @@ int main(int argc, char *argv[]) {
             //always a null character at the end of the string
             prog[i] = '\0';
 
-            //
-            //std::cout << "now at the end of the string \n";
         }
 
 
-        //std::cout <<"i: " << i << "\n";
 
         i++;
 
     }
-    std::cout <<"prog:  " << prog << "    args:   " << args<< "\n";
+    std::cout <<"prog:  " << prog << "    args:   " << args<< "\n\n";
     parse(prog,&args);
-    std::cout <<"prog:  " << prog << "    args:   " << args<< "\n";
+    std::cout <<"Done."<< "\n";
+
 
 
 
