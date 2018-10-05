@@ -20,6 +20,12 @@ int size_of(char *array){
 
 }
 
+void CallPrograms(char **seperated, int num_args){
+
+    char * run_program = seperated[0];
+    std::cout <<"Call Program " << run_program<< " with " << num_args << " arguments"<<"\n";
+
+}
 
 void parse(char *prog, char **parsed){
     std::cout <<"got to parse" << "\n";
@@ -53,6 +59,7 @@ void parse(char *prog, char **parsed){
     std::cout <<"Number of Args: " << num_args<<"\n";
 
 
+    CallPrograms(seperated, num_args);
 
     //SWITCH run_program == "cd"
     //SWITCH run_program == "ls"
@@ -64,8 +71,8 @@ void parse(char *prog, char **parsed){
 
 
 
-void run() {
-    std::cout <<"got to run" << "\n";
+void ReadAndParseCmd() {
+    //std::cout <<"got to run" << "\n";
     bool end_line = false;
     int max_size = 512;  //TODO: switch to buffer or malloc system if necessary
     int i = 0;
@@ -129,5 +136,5 @@ void run() {
 }
 
 int main(int argc, char *argv[]) {
-    run();
+    ReadAndParseCmd();
 }
