@@ -2,6 +2,9 @@
 #include <iostream>
 #include <unistd.h>
 
+#include <stdio.h>
+#include <string.h>
+
 int size_of(char *array){
     int i = 0;
 
@@ -14,83 +17,29 @@ int size_of(char *array){
 }
 
 
-void parse(char *prog, char *parsed){
+void parse(char *prog, char **parsed){
 
     //Parsing char array received, basically a split line function, in progress
 
     std::cout << "Call parse: " << "\n";
-    char splitter = ' ';
-
-    char *input;
+    std::cout << "PRE SPLIT: prog: " << prog << " parsed: " << *parsed<< "\n";
     int i = 0;
-    int split_loc = 0;
-    int num_spaces = 0;
-    char command[5];
-    char argument[10];
+    char split_memory[110];
+    char *split = split_memory;
 
-    int max_num_split = 10; //TODO: make this dynamically allocating
-    char arg_list[12];
+    //http://www.cplusplus.com/reference/cstring/strtok/
+    split = strtok(prog, " ");
 
-    /*
-    char** arg_list = new char*[max_num_split]; //max_num_split should be the num of possible arrays
-    for(int j = 0; j < max_num_split ; ++j){
-        arg_list[j] = new char[10];
-    }
-    */
-
-    input = prog;
-
-    std::cout << "prog: " << prog << " input: " << input << " parsed: " << parsed<< "\n";
-
-    while(input[i] != '\0'){
-        //If a space is found
-        std::cout << "i: " << i  << "\n";
-        if(input[i] == splitter){
-            //num_spaces=num_spaces + 1; BUG: this results in num_spaces = 25965 on third iteration
-            //maybe running out of memory
-            split_loc=i;
-            num_spaces++;
-            std::cout << "Arg List at num_spaces = " << num_spaces << ": " << "\n";
-
-            for(int a = 0; a < i; ++a){
-                std::cout << "a: " << a << " < i: " << i << "\n";
-                command[a] = input[a];
-                //std::cout << "put in command: "<< input[a] << "\n";
-            }
-            //for 2D array
-            //arg_list[num_spaces] = command;
-            std::cout << "numspaces: " << num_spaces << "\n";
-            arg_list[num_spaces] = command[0];
-
-            std::cout << "Arg List at num_spaces = " << num_spaces << ": " << arg_list[num_spaces] << "\n";
-
-
-
-            command[i] = '\0';
-        }
-
-
-        if(input[i+1] == '\0'){
-            for(int a = 0; a < i - split_loc; ++a){
-                argument[a] = input[a + split_loc + 1];
-                argument[a + 1] = '\0';
-
-            }
-
-            argument[i+1] = '\0';
-
-        }
-
-        i++;
-
-
+    while (split != NULL){
+        std::cout << "i: " << i << " split: " << split<<"\n";
+        parsed[i] = split;
+        split = strtok(NULL, " ");
+        ++i;
     }
 
-    std::cout << "Command: "<< command << "\n";
-    std::cout << "Arg: "<< argument << "\n";
 
-    //Return parsed arrays
-    std::cout << "returned array: " << parsed << "\n";
+    std::cout << "POST SPLIT: prog: " << prog << " parsed: " << *parsed << " split: " << *split<< "\n";
+    std::cout << "parsed[0]: " << parsed[0];
 
 
 }
@@ -112,20 +61,25 @@ int main(int argc, char *argv[]) {
 
     //if you do this it creates in_one in read-only memory, can't change
     //char *in_one = "one-";
-    char test_prog[100] = "cd home now";
-    char test_parsed[100] = "arg1 arg2 arg3 arg4";
 
 
-    parse(test_prog, test_parsed);
 
-    std::cout <<"test prog after: " << test_prog << "\n";
-    std::cout <<"test args after: " << test_parsed << "\n";
+
+
+    //std::cout <<"test prog after: " << test_prog << "\n";
+    //std::cout <<"test args after: " << test_parsed << "\n";
     //std::cout <<"parsed: " << parsed_char << "\n";
 
     char char_read = NULL;
-    char prog[max_size]; //the program contains all input
+    char * prog; //the program contains all input
     char * parsed; //the program contains all input
-    char ** args = NULL; //the arguments are the pieces of the program, seperated by space
+
+    //char args[max_size];
+    char *args = "hello";
+
+    //char * args;
+
+    //char ** args = NULL; //the arguments are the pieces of the program, seperated by space
 
     int max_bytes = 1; //reads at most 1 byte at a time
     int fd_read = 0; //this if the fd (file descriptior) for read
@@ -146,6 +100,8 @@ int main(int argc, char *argv[]) {
             end_line = true;
             //always a null character at the end of the string
             prog[i] = '\0';
+
+            //
             //std::cout << "now at the end of the string \n";
         }
 
@@ -155,7 +111,9 @@ int main(int argc, char *argv[]) {
         i++;
 
     }
-    std::cout <<"prog:  " << prog << "\n";
+    std::cout <<"prog:  " << prog << "    args:   " << args<< "\n";
+    parse(prog,&args);
+
 
 
 
