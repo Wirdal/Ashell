@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <dirent.h>
 
 void AshellPrint(const char* output){
 //Write to 0 for STDIN_FILENO
@@ -62,10 +63,49 @@ void cd(std::string directory){
         AshellPrint("Error changing directory \n");
 
     }
-    free(cdirectory)
 };
-char* ls(char* directory){
-//TODO
+// BIG help in ls
+// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
+void ls(const char* directory){
+  DIR* dir;
+  struct dirent *entry;
+  dir = opendir(directory);
+  if (NULL != dir){
+    entry = readdir(dir);
+    while (NULL != entry){
+      AshellPrint(entry->d_name);
+      AshellPrint("\n");
+      entry = readdir(dir);
+    }
+  }
+};
+
+void ls(std::string directory){
+  DIR* dir;
+  struct dirent *entry;
+  dir = opendir(directory.c_str());
+  if (NULL != dir){
+    entry = readdir(dir);
+    while (NULL != entry){
+      AshellPrint(entry->d_name);
+      AshellPrint("\n");
+      entry = readdir(dir);
+    }
+  }
+};
+
+void ls(){
+  DIR* dir;
+  struct dirent *entry;
+  dir = opendir(get_current_dir_name());
+  if (NULL != dir){
+    entry = readdir(dir);
+    while (NULL != entry){
+      AshellPrint(entry->d_name);
+      AshellPrint("\n");
+      entry = readdir(dir);
+    }
+  }
 };
 
 char* ff(char* filename){

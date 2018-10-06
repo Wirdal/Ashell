@@ -13,6 +13,10 @@ http://man7.org/linux/man-pages/man3/exit.3.html
 References in cd
 https://linux.die.net/man/2/chdir
 
+References in ls
+https://www.geeksforgeeks.org/structures-c/
+https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
+
 For CPP tutorials
 https://www.tutorialspoint.com/cplusplus/cpp_overloading.htm
 https://www.geeksforgeeks.org/char-vs-stdstring-vs-char-c/
@@ -22,3 +26,6 @@ http://www.cplusplus.com/reference/cstring/strtok/
 
 For Shell explanations
 Operating System Principles & Practices Second Edition (Thomas Anderson and Michael Dahlin)
+
+Error codes
+http://www.virtsync.com/c-error-codes-include-errno
