@@ -26,14 +26,26 @@ size_t AshellRead(int fd, void *buf, size_t count); //Maybe will need more?
 // Shell commands
 
 
-void pwd(); // May need a path arguement
+void pwd();
 
 void exit();
 
-void cd(char* directory); //Will need to deal with the HOME with a default var
+void cd(char* directory);
 
 char* ls(char* directory);
 
 char* ff(char* filename);
+
+// Reading
+
+
+int size_of(char *array);
+
+void CallPrograms(char **seperated, int num_args);
+
+void parse(char *prog, char **parsed);
+
+void ReadAndParseCmd();
+
 
 #endif
