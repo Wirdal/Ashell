@@ -62,6 +62,7 @@ void cd(std::string directory){
         AshellPrint("Error changing directory \n");
 
     }
+    free(cdirectory)
 };
 char* ls(char* directory){
 //TODO
