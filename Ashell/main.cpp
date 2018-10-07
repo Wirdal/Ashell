@@ -3,9 +3,7 @@
 #include <string.h>
 
 int main (int argc, char *argv[]) {
-  std::string dir ="/";
-  ls(dir);
-  ReadAndParseCmd(); //eventually this will be main loop initiator: like while(ReadAndParseCmd()) [see pg 112 of text]
+  ls();
   //Main loops goes here
   //While true
     //Wait for input
