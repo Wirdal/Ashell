@@ -4,6 +4,40 @@
 #include <stdio.h>
 #include <string.h>
 
+
+//from noncanmode.c
+#include <unistd.h>
+#include <stdlib.h>
+#include <termios.h>
+#include <ctype.h>
+
+//from noncanmode.c
+void ResetCanonicalMode(int fd, struct termios *savedattributes){
+    tcsetattr(fd, TCSANOW, savedattributes);
+}
+
+//from noncanmode.c
+void SetNonCanonicalMode(int fd, struct termios *savedattributes){
+    struct termios TermAttributes;
+    char *name;
+
+    // Make sure stdin is a terminal.
+    if(!isatty(fd)){
+        fprintf (stderr, "Not a terminal.\n");
+        exit(0);
+    }
+
+    // Save the terminal attributes so we can restore them later.
+    tcgetattr(fd, savedattributes);
+
+    // Set the funny terminal modes.
+    tcgetattr (fd, &TermAttributes);
+    TermAttributes.c_lflag &= ~(ICANON | ECHO); // Clear ICANON and ECHO.
+    TermAttributes.c_cc[VMIN] = 1;
+    TermAttributes.c_cc[VTIME] = 0;
+    tcsetattr(fd, TCSAFLUSH, &TermAttributes);
+}
+
 void AshellPrint(const char* output){
 //Write to 0 for STDIN_FILENO
 //Write to 1 fir STDOUT_FILENO
@@ -84,8 +118,10 @@ void CallPrograms(char **seperated, int num_args){
 
     if(run_program[0] == 'c' && run_program[1] == 'd' && run_program[2] == '\0'){
         std::cout <<"Execute CD "<<"\n";
+
         char * directory = seperated[1]; //TODO: check to see if it exists
-        cd(directory);
+        std::cout <<"directory "<< directory <<"\n";
+        //cd(directory);
     }
     else if(run_program[0] == 'l' && run_program[1] == 's' && run_program[2] == '\0'){
         std::cout <<"Execute LS "<<"\n";
@@ -93,7 +129,7 @@ void CallPrograms(char **seperated, int num_args){
     }
     else if(run_program[0] == 'p' && run_program[1] == 'w' && run_program[2] == 'd' && run_program[3] == '\0'){
         std::cout <<"Execute PWD "<<"\n";
-        pwd();
+        //pwd();
     }
     else if(run_program[0] == 'e' && run_program[1] == 'x' && run_program[2] == 'i' && run_program[3] == 't' && run_program[4] == '\0'){
         std::cout <<"Execute EXIT "<<"\n";
@@ -136,7 +172,7 @@ void parse(char *prog, char **parsed){
     }
     seperated[i] = split;
 
-    std::cout << "\n\n";
+
 
     char * run_program = seperated[0];
     int num_args = i -1;
@@ -158,8 +194,8 @@ void ReadAndParseCmd() {
     //if you do this it creates in_one in read-only memory, can't change
     //char *in_one = "one-";
 
-    char prog_mem[100] = "12345678";
-    char args_mem[100] = "12345678";
+    char prog_mem[100] = ""; //should be large?
+    char args_mem[100] = ""; //should b 16 (max can show on terminal)?
 
     char char_read = '\0';
     char * prog = prog_mem; //the program contains all input
@@ -167,28 +203,44 @@ void ReadAndParseCmd() {
     char *args = args_mem; //Input after the command/program
 
     int max_bytes = 1; //reads at most 1 byte at a time
+
+    //this may need to be STDIN_FILENO
     int fd_read = 0; //this if the fd (file descriptor) for read
 
 
+    struct termios SavedTermAttributes; //from noncanmode.c
+    SetNonCanonicalMode(0, &SavedTermAttributes); //from noncanmode.c
 
     while (!end_line){
         //bytes_read is the number of bytes SUCCESSFULLY read
         //Example: if "Ben" is typed with max_bytes being 10, 4 is returned.
         //std::cout <<"got to while" << "\n";
-        bytes_read = read(fd_read, &char_read, max_bytes);
+        bytes_read = read(STDIN_FILENO, &char_read, max_bytes);
 
 
         //if the input is readable
-        if (isprint(char_read)){
+        if(0x04 == char_read){ // C-d
+            std::cout <<"its something else entirely..." << "\n";
+            break;
+        }
+        else if (isprint(char_read)){
             //std::cout <<"got to if" << "\n";
             //std::cout <<"got to if" << "\n";
-            //std::cout <<"this comes out: " << prog << "\n";
+            std::cout <<"this comes out: " << prog << "\n";
             prog[i] = char_read;
         }
 
-        else if ("0\\") {
-            //std::cout <<"got to end line" << "\n";
+        else if ('0') {
+            std::cout <<"got to end line - so we think" << "\n";
             end_line = true;
+            //always a null character at the end of the string
+            //prog[i] = '\0';
+
+        }
+        else{
+            //backspace, arrow, ect
+            std::cout <<"its something else entirely..." << "\n";
+            //end_line = true;
             //always a null character at the end of the string
             prog[i] = '\0';
 
@@ -197,6 +249,7 @@ void ReadAndParseCmd() {
         i++;
 
     }
+    ResetCanonicalMode(STDIN_FILENO, &SavedTermAttributes);
     //std::cout <<"prog:  " << prog << "    args:   " << args<< "\n\n";
     parse(prog,&args);
     //std::cout <<"Done."<< "\n";
@@ -204,5 +257,8 @@ void ReadAndParseCmd() {
 
 }
 int main(int argc, char *argv[]) {
-    ReadAndParseCmd();
+    while(1){
+        ReadAndParseCmd();
+    }
+
 }
