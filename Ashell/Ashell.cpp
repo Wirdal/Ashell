@@ -336,9 +336,24 @@ void ls(){
   }
 };
 
-void ff(char* filename){
+char* ff(char* filename){
 //Might need to return a container or something
-  char* dir = get_current_dir_name();
+  DIR* dir;
+  struct dirent *entry;
+  dir = opendir(get_current_dir_name());
+  if (NULL != dir){
+  entry = readdir(dir);
+  struct stat statbuff;
+  while (NULL != entry){
+    // Check for directorys first
+    stat(entry->d_name, &statbuff);
+    if (S_ISDIR(statbuff.st_mode)){
+      //chdir into that dir
+      AshellPrint(ff(filename));
+    }
+    if (entry->d_name == filename){
+      return //the current directory
+    }
   // Loop through each one of the files
   // If it is a directory
   //  chdir into it, and recurse on it
