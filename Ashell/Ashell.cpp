@@ -477,7 +477,7 @@ void ReadAndParseCmd() {
         else if (0x7F == char_read){
             //std::cout <<"got to if" << "\n";
             //std::cout <<"got to if" << "\n";
-            AshellPrint("\b \b");
+            AshellPrint("\b \b"); //this backspaces
             prog[i] = char_read;
             //std::cout <<"this comes out: " << prog << "\n";
 
