@@ -211,6 +211,7 @@ void ReadAndParseCmd() {
     char * prog = prog_mem; //the program contains all input
     char * parsed; //to contain parsed input
     char *args = args_mem; //Input after the command/program
+    bool arrow_flag;
 
     int max_bytes = 1; //reads at most 1 byte at a time
 
@@ -242,6 +243,43 @@ void ReadAndParseCmd() {
             //std::cout <<"this comes out: " << prog << "\n";
 
         }
+        //ARROW CASE
+        else if (arrow_flag && 0x5B != char_read){
+
+            //std::cout <<"ARROW2" << "\n";
+
+
+            if(0x41 == char_read){
+                //UPARROW
+                AshellPrint("UPARROW");
+                arrow_flag = false;
+            }
+            else if(0x42 == char_read){
+                //DOWNARROW
+                AshellPrint("DOWNARROW");
+                arrow_flag = false;
+            }
+            else if(0x43 == char_read){
+                //RIGHTARROW
+                AshellPrint("RIGHTARROW");
+                arrow_flag = false;
+            }
+            else if(0x44 == char_read){
+                //LEFTARROW
+                AshellPrint("LEFTARROW");
+                arrow_flag = false;
+            }
+            else{
+                //ERROR, shouldn't happen
+            }
+
+
+        }
+        else if (arrow_flag && 0x5B == char_read){
+
+            arrow_flag = true;
+
+        }
 
         else if (isprint(char_read)){
             //these lines don't fix it
@@ -252,20 +290,22 @@ void ReadAndParseCmd() {
             AshellPrint(str1);
 
         }
-
-        else if ('0') {
-            //std::cout <<"got to end line - so we think 1" << "\n";
+        //ENTER CHASE
+        else if (0x0A == char_read) {
+            std::cout <<"got to end line - so we think 1" << "\n";
             end_line = true;
             //always a null character at the end of the string
             //prog[i] = '\0';
 
         }
         else{
-            //backspace, arrow, ect
-            std::cout <<"its something else entirely..." << "\n";
+            //std::cout <<"char(" << char_read<<")";
+            //ARROW CASE
+            //AshellPrint("ARROW");
+            arrow_flag = true;
             //end_line = true;
             //always a null character at the end of the string
-            prog[i] = '\0';
+            //prog[i] = '\0';
 
         }
         //std::cout <<"out of if" << "\n";
