@@ -338,7 +338,13 @@ void ls(){
 
 void ff(char* filename){
 //Might need to return a container or something
-  
+  char* dir = get_current_dir_name();
+  // Loop through each one of the files
+  // If it is a directory
+  //  chdir into it, and recurse on it
+  // If it is a file
+      // If it filename == looked for Filename
+      // return that file. Since there can be only one
 };
 
 //convert a string
