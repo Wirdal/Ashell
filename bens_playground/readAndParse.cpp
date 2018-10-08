@@ -44,6 +44,7 @@ void AshellPrint(const char* output){
 //Write to 2 for STDERR_FILENO
 //We're gonna write to 1, so we can print to the console
     //Find how much we need to write
+
     int size = strlen(output);
     int written = 0;
     while(size != written){
@@ -53,10 +54,11 @@ void AshellPrint(const char* output){
     };
 };
 void AshellPrint(std::string output){
-    //I can't think of a better way to do this
+
     AshellPrint(output.c_str());
 };
 void AshellPrint(int output){
+
     std::string out2 = std::to_string(output);
     AshellPrint(out2.c_str());
 };
@@ -104,6 +106,14 @@ char* ls(char* directory){
 char* ff(char* filename){
 //TODO
 };
+
+
+//convert a string
+//https://www.geeksforgeeks.org/how-to-convert-a-single-character-to-string-in-cpp/
+std::string charString (char x){
+    std::string str(1, x);
+    return str;
+}
 
 int size_of(char *array){
     int i = 0;
@@ -223,15 +233,28 @@ void ReadAndParseCmd() {
             std::cout <<"its something else entirely..." << "\n";
             break;
         }
-        else if (isprint(char_read)){
+        //BACKSPACE CASE
+        else if (0x7F == char_read){
             //std::cout <<"got to if" << "\n";
             //std::cout <<"got to if" << "\n";
-            std::cout <<"this comes out: " << prog << "\n";
+            AshellPrint("BACKSPACE");
             prog[i] = char_read;
+            //std::cout <<"this comes out: " << prog << "\n";
+
+        }
+
+        else if (isprint(char_read)){
+            //these lines don't fix it
+            prog[i] = char_read;
+            //char dec_to_char = prog[i];
+            //std::cout << "prog[i]: " << prog[i] <<"\n"; //getting the decimal representation
+            std::string str1 = charString(prog[i]);
+            AshellPrint(str1);
+
         }
 
         else if ('0') {
-            std::cout <<"got to end line - so we think" << "\n";
+            //std::cout <<"got to end line - so we think 1" << "\n";
             end_line = true;
             //always a null character at the end of the string
             //prog[i] = '\0';
