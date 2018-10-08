@@ -3,7 +3,10 @@
 #include <string.h>
 
 int main (int argc, char *argv[]) {
-  ls();
+  //ls();
+  while(1){
+    ReadAndParseCmd(); 
+  }
   //Main loops goes here
   //While true
     //Wait for input
