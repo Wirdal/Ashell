@@ -113,7 +113,7 @@ void ls(const char* directory){
 		if (S_ISDIR(statbuff.st_mode)){
 			AshellPrint("d");
 		}
-		else { 
+		else {
 			AshellPrint("-");
 		}
 		if (statbuff.st_mode & S_IRUSR) {
@@ -191,7 +191,7 @@ void ls(std::string directory){
 		if (S_ISDIR(statbuff.st_mode)){
 			AshellPrint("d");
 		}
-		else { 
+		else {
 			AshellPrint("-");
 		}
 		if (statbuff.st_mode & S_IRUSR) {
@@ -270,7 +270,7 @@ void ls(){
 		if (S_ISDIR(statbuff.st_mode)){
 			AshellPrint("d");
 		}
-		else { 
+		else {
 			AshellPrint("-");
 		}
 		if (statbuff.st_mode & S_IRUSR) {
@@ -336,8 +336,9 @@ void ls(){
   }
 };
 
-char* ff(char* filename){
-//TODO
+void ff(char* filename){
+//Might need to return a container or something
+  
 };
 
 //convert a string

@@ -36,7 +36,7 @@ void ls(char* directory);
 void ls(std::string directory);
 void ls();
 
-char* ff(char* filename);
+void ff(char* filename);
 
 // Reading
 
