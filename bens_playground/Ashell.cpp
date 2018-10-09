@@ -532,12 +532,15 @@ void ReadAndParseCmd() {
                 //AshellPrint("UP");
 
                 //backspace
-                for(int n = 0; n < i; n++){ //works by using i. Strangely also works using i - 2
+                for(int n = 0; n < 10; n++){ //works by using i. Strangely also works using i - 2
                     AshellPrint("\b \b"); //this backspaces
                 }
 
                 AshellPrint(hist[num_lines - 1]);
+
                 num_lines--;
+                hist[num_lines][key_location] = prog[key_location];
+
 
 
 
@@ -546,6 +549,17 @@ void ReadAndParseCmd() {
             else if(0x42 == char_read){
                 //DOWNARROW
                 //AshellPrint("DOWNARROW");
+
+                for(int n = 0; n < 10; n++){ //works by using i. Strangely also works using i - 2
+                    AshellPrint("\b \b"); //this backspaces
+                }
+
+                AshellPrint(hist[num_lines+1]);
+
+                num_lines++;
+                hist[num_lines][key_location] = prog[key_location];
+
+
                 arrow_flag = false;
             }
             else if(0x43 == char_read){
