@@ -373,6 +373,7 @@ std::vector<char*> ff(const char* filename, const char* directory){
       //Is it the file we are looking for?
       if (strcmp(entry->d_name, directory)){
         std::cout << "Reading file "<< entry->d_name << '\n';
+	//Tack on filename right here
         vec.push_back(get_current_dir_name());
       }
     }
