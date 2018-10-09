@@ -530,7 +530,17 @@ void ReadAndParseCmd() {
             if(0x41 == char_read){
                 //UPARROW
                 //AshellPrint("UP");
+
+                //backspace
+                for(int n = 0; n < i; n++){ //works by using i. Strangely also works using i - 2
+                    AshellPrint("\b \b"); //this backspaces
+                }
+
                 AshellPrint(hist[num_lines - 1]);
+                num_lines--;
+
+
+
                 arrow_flag = false;
             }
             else if(0x42 == char_read){
@@ -560,12 +570,15 @@ void ReadAndParseCmd() {
 
         }
 
+        //STANDARD CASE
+
         else if (isprint(char_read)){
             //these lines don't fix it
             prog[i] = char_read;
             //char dec_to_char = prog[i];
             //std::cout << "prog[i]: " << prog[i] <<"\n"; //getting the decimal representation
             std::string str1 = charString(prog[i]);
+
             AshellPrint(str1);
 
         }
