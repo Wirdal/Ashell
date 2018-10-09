@@ -1,11 +1,15 @@
 #include "Ashell.hh"
 #include <unistd.h>
 #include <string.h>
+#include <iostream>
 
 int main (int argc, char *argv[]) {
-  //ls();
-  while(1){
-    ReadAndParseCmd(); 
+  const char *file = "ff";
+  const char *dir = "Ashell/fftest";
+  std::vector<char*> vec;
+  ff(file, dir);
+  for(int i=0; i<vec.size(); ++i){
+    std::cout << vec[i] << "\n";
   }
   //Main loops goes here
   //While true
