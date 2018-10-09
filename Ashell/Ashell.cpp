@@ -374,7 +374,8 @@ std::vector<char*> ff(const char* filename, const char* directory){
       if (strcmp(entry->d_name, directory)){
         std::cout << "Reading file "<< entry->d_name << '\n';
 	//Tack on filename right here
-        vec.push_back(get_current_dir_name());
+	char* fileloc =  strcat(strcat(get_current_dir_name(), "/"),filename);
+        vec.push_back(fileloc);
       }
     }
     entry = readdir(dir);

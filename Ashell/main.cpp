@@ -13,7 +13,7 @@ int main (int argc, char *argv[]) {
   std::vector<char*> vec;
   vec = ff(file, dir);
   for(int i=0; i<vec.size(); ++i){
-    std::cout << "printing found locations " <<  vec[i] << " filename" <<  "\n";
+    std::cout << "printing found locations " <<  vec[i] <<   "\n";
    }
   //Main loops goes here
   //While true
