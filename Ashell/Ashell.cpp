@@ -340,6 +340,8 @@ std::vector<char*> ff(const char* filename, const char* directory){
   DIR* dir;
   struct dirent *entry;
   struct stat statbuff;
+  char dot[2] = ".";
+  char dotdot[3] = "..";
 
   if (NULL == directory){
     std::cout << "Null directory, Changing to" << get_current_dir_name() << "\n";  
@@ -357,24 +359,32 @@ std::vector<char*> ff(const char* filename, const char* directory){
   std::cout << "Opening directory " << get_current_dir_name() << "\n";
   dir = opendir(get_current_dir_name());
   entry = readdir(dir);
-  std::cout << "Current dir" << get_current_dir_name() << '\n';
+  std::cout <<"Got here \n";
+
   while (NULL != entry){
     stat(entry->d_name, &statbuff);
     if (S_ISDIR(statbuff.st_mode)){
-        if ("." ==entry->d_name || ".." == entry->d_name){
-          // its a directory. Call this function on it
-          // Add the vector to it and return ff(filename, entry->d_aname)
-          std::vector <char*> retvec = ff(filename,get_current_dir_name());
-          vec.insert(vec.end(), retvec.begin(), retvec.end());
+	    std::cout << entry->d_name << " is a dir\n";
+        if (!(strcmp(".", entry->d_name)|| strcmp("..", entry->d_name))){
+	       	  // its a directory. Call this function on it
+	          // Add the vector to it and return ff(filename, entry->d_aname)
+		  std::cout << "Looking at dir " << entry->d_name <<  "\n";
+	          std::vector <char*> retvec = ff(filename,entry->d_name);
+        	  vec.insert(vec.end(), retvec.begin(), retvec.end());
+	
         }
     }
     else{
       //Its a file
       //Is it the file we are looking for?
-      if (strcmp(entry->d_name, directory)){
+	    std::cout << entry->d_name << " is a file \n";
+      if (0==strcmp(filename, entry->d_name)){
         std::cout << "Reading file "<< entry->d_name << '\n';
 	//Tack on filename right here
-	char* fileloc =  strcat(strcat(get_current_dir_name(), "/"),filename);
+	char dircpy[1024];
+        strcpy(dircpy, directory);
+        std::cout << "directory copied" << "\n";	
+	char* fileloc =  strcat(strcat(dircpy, "/"),filename);
         vec.push_back(fileloc);
       }
     }

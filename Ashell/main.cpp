@@ -5,7 +5,7 @@
 
 int main (int argc, char *argv[]) {
   const char *file = "ff";
-  const char *dir = "Ashell/fftest";
+  const char *dir = "fftest";
 
 
   std::cout << "Chaning current dir " << get_current_dir_name()<< "\n";
