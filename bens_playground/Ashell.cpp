@@ -419,7 +419,7 @@ void CallPrograms(char **seperated, int num_args){
         ff(filename);
     }
     else{
-        std::cout <<"Run Exec(" << run_program<<");" <<"\n";
+        std::cout <<"\n"<<"Run Exec(" << run_program<<");" <<"\n";
         //TODO: exec(program_name)
     }
 
@@ -481,7 +481,10 @@ void ReadAndParseCmd() {
     char * prog = prog_mem; //the program contains all input
     char * parsed; //to contain parsed input
     char *args = args_mem; //Input after the command/program
+    char hist[10][10];
     //char **hist = hist_mem;
+
+
     bool arrow_flag;
 
     int max_bytes = 1; //reads at most 1 byte at a time
@@ -496,9 +499,11 @@ void ReadAndParseCmd() {
     while (!end_line){
         //bytes_read is the number of bytes SUCCESSFULLY read
         //Example: if "Ben" is typed with max_bytes being 10, 4 is returned.
-        //std::cout <<"got to while" << "\n";
-        //hist[num_lines] = prog;
-        std::cout <<"prog at numlines "<<num_lines<<": " << prog <<"\n";
+        //std::cout <<"prog["<<i<<"]: "<< prog[i-1] << "\n";
+        int key_location = i-1;
+        hist[num_lines][key_location] = prog[key_location];
+        //std::cout <<"prog at numlines "<<num_lines<<": " << hist[num_lines][i-1] <<"\n";
+        //std::cout <<"history at numlines: "<<num_lines<<": " << hist[num_lines] <<"\n";
         bytes_read = read(STDIN_FILENO, &char_read, max_bytes);
 
 
@@ -524,8 +529,8 @@ void ReadAndParseCmd() {
 
             if(0x41 == char_read){
                 //UPARROW
-                AshellPrint("UP");
-                AshellPrint(prog[0]);
+                //AshellPrint("UP");
+                AshellPrint(hist[num_lines - 1]);
                 arrow_flag = false;
             }
             else if(0x42 == char_read){
