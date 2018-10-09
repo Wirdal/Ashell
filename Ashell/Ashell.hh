@@ -1,6 +1,7 @@
 #ifndef ASHELL_H
 #define ASHELL_H
 #include <string>
+#include <vector>
 /*
 This file is meant to go over the implementation for Ashell.
 Probaby will be more here, but define implemetnation here first
@@ -36,7 +37,7 @@ void ls(char* directory);
 void ls(std::string directory);
 void ls();
 
-char* ff(char* filename);
+std::vector<char*> ff(const char* filename, const char* directory);
 
 // Reading
 
