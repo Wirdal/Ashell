@@ -6,11 +6,15 @@
 int main (int argc, char *argv[]) {
   const char *file = "ff";
   const char *dir = "Ashell/fftest";
+
+
+  std::cout << "Chaning current dir " << get_current_dir_name()<< "\n";
+  chdir(get_current_dir_name());
   std::vector<char*> vec;
-  ff(file, dir);
+  vec = ff(file, dir);
   for(int i=0; i<vec.size(); ++i){
-    std::cout << vec[i] << "\n";
-  }
+    std::cout << "printing found locations " <<  vec[i] << " filename" <<  "\n";
+   }
   //Main loops goes here
   //While true
     //Wait for input

@@ -342,12 +342,19 @@ std::vector<char*> ff(const char* filename, const char* directory){
   struct stat statbuff;
 
   if (NULL == directory){
+    std::cout << "Null directory, Changing to" << get_current_dir_name() << "\n";  
     chdir(get_current_dir_name());
   }
   else{
-    chdir(directory);
+    std::cout << "Changing to passed dir " << directory << "\n";  
+    if (-1 == chdir(directory)){
+	    AshellPrint("Error changing directory");
+  	    AshellPrint("\n");
+	    return vec;
+    }
   }
 
+  std::cout << "Opening directory " << get_current_dir_name() << "\n";
   dir = opendir(get_current_dir_name());
   entry = readdir(dir);
   std::cout << "Current dir" << get_current_dir_name() << '\n';
@@ -365,7 +372,7 @@ std::vector<char*> ff(const char* filename, const char* directory){
       //Its a file
       //Is it the file we are looking for?
       if (strcmp(entry->d_name, directory)){
-        std::cout << "Reading file" << '\n';
+        std::cout << "Reading file "<< entry->d_name << '\n';
         vec.push_back(get_current_dir_name());
       }
     }
