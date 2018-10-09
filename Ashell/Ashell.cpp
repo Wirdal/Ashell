@@ -344,16 +344,18 @@ char* ff(char* filename){
   if (NULL != dir){
   entry = readdir(dir);
   struct stat statbuff;
-  while (NULL != entry){
-    // Check for directorys first
-    stat(entry->d_name, &statbuff);
-    if (S_ISDIR(statbuff.st_mode)){
-      //chdir into that dir
-      AshellPrint(ff(filename));
+    while (NULL != entry){
+      // Check for directorys first
+      stat(entry->d_name, &statbuff);
+      if (S_ISDIR(statbuff.st_mode)){
+          //chdir into that dir
+          AshellPrint(ff(filename));
+      }
+      if (entry->d_name == filename){
+        //the current directory
+      }
     }
-    if (entry->d_name == filename){
-      return //the current directory
-    }
+  }
   // Loop through each one of the files
   // If it is a directory
   //  chdir into it, and recurse on it
