@@ -478,7 +478,7 @@ void ReadAndParseCmd() {
 
     char * prog = prog_mem; //Array containing chars until enter hit
     char *args = args_mem; 	//Input after the command/program
-//	char * parsed; 			//to contain parsed input
+	//char * parsed; 			//to contain parsed input
 
     char hist[10][10];
 	char char_read = '\0';
