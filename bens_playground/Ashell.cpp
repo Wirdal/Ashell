@@ -1,18 +1,16 @@
 #include <fcntl.h>
-#include <iostream>
+#include <iostream> //remove this later
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
-//from noncanmode.c
-#include <unistd.h>
 #include <stdlib.h>
 #include <termios.h>
 #include <ctype.h>
-
+#include <vector>
+#include <typeinfo>
 //from noncanmode.c
 void ResetCanonicalMode(int fd, struct termios *savedattributes){
     tcsetattr(fd, TCSANOW, savedattributes);
@@ -65,16 +63,16 @@ void AshellPrint(int output){
 
 size_t AshellRead(int fd, void *buf, size_t count){
 //TODO
-}
+};
 
 int AshellOpen(const char *path, int flags, .../*, mode_t mode*/){
 //TODO
-}
+};
 // Shell commands
-/*
+
 
 void pwd(){
-	//char *path = get_current_dir_name();
+	char *path = get_current_dir_name();
 	AshellPrint(path);
 	free(path);
 	AshellPrint("\n");
@@ -104,78 +102,78 @@ void ls(const char* directory){
   DIR* dir;
   struct dirent *entry;
   dir = opendir(directory);
-    if (NULL != dir){
-	entry = readdir(dir);
+  if (NULL != dir){
+	   entry = readdir(dir);
 	// Set the buffer for stat here
-	struct stat statbuff; //I think segfaults happen here?
-	while (NULL != entry){
-		stat(entry->d_name, &statbuff);
-		if (S_ISDIR(statbuff.st_mode)){
-			AshellPrint("d");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IRUSR) {
-			AshellPrint("r");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IWUSR) {
-			AshellPrint("w");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IXUSR) {
-			AshellPrint("x");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IRGRP) {
-			AshellPrint("r");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IWGRP) {
-			AshellPrint("w");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IXGRP) {
-			AshellPrint("x");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IROTH) {
-			AshellPrint("r");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IWOTH) {
-			AshellPrint("w");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IXOTH) {
-			AshellPrint("w");
-		}
-		else {
-			AshellPrint("-");
-		}
-		AshellPrint(" ");
-		AshellPrint(entry->d_name);
-		AshellPrint("\n");
-		entry = readdir(dir);
+	   struct stat statbuff; //I think segfaults happen here?
+  	while (NULL != entry){
+  		stat(entry->d_name, &statbuff);
+  		if (S_ISDIR(statbuff.st_mode)){
+  			AshellPrint("d");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IRUSR) {
+  			AshellPrint("r");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IWUSR) {
+  			AshellPrint("w");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IXUSR) {
+  			AshellPrint("x");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IRGRP) {
+  			AshellPrint("r");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IWGRP) {
+  			AshellPrint("w");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IXGRP) {
+  			AshellPrint("x");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IROTH) {
+  			AshellPrint("r");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IWOTH) {
+  			AshellPrint("w");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IXOTH) {
+  			AshellPrint("w");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		AshellPrint(" ");
+  		AshellPrint(entry->d_name);
+  		AshellPrint("\n");
+  		entry = readdir(dir);
 
-	}
+  	}
   }
 };
 
@@ -184,186 +182,219 @@ void ls(std::string directory){
   struct dirent *entry;
   dir = opendir(directory.c_str());
   if (NULL != dir){
-	entry = readdir(dir);
-	struct stat statbuff; //I think segfaults happen here?
-	while (NULL != entry){
-		stat(entry->d_name, &statbuff);
-		if (S_ISDIR(statbuff.st_mode)){
-			AshellPrint("d");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IRUSR) {
-			AshellPrint("r");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IWUSR) {
-			AshellPrint("w");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IXUSR) {
-			AshellPrint("x");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IRGRP) {
-			AshellPrint("r");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IWGRP) {
-			AshellPrint("w");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IXGRP) {
-			AshellPrint("x");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IROTH) {
-			AshellPrint("r");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IWOTH) {
-			AshellPrint("w");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IXOTH) {
-			AshellPrint("w");
-		}
-		else {
-			AshellPrint("-");
-		}
-		AshellPrint(" ");
-		AshellPrint(entry->d_name);
-		AshellPrint("\n");
-		entry = readdir(dir);
+  	entry = readdir(dir);
+  	struct stat statbuff; //I think segfaults happen here?
+  	while (NULL != entry){
+  		stat(entry->d_name, &statbuff);
+  		if (S_ISDIR(statbuff.st_mode)){
+  			AshellPrint("d");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IRUSR) {
+  			AshellPrint("r");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IWUSR) {
+  			AshellPrint("w");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IXUSR) {
+  			AshellPrint("x");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IRGRP) {
+  			AshellPrint("r");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IWGRP) {
+  			AshellPrint("w");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IXGRP) {
+  			AshellPrint("x");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IROTH) {
+  			AshellPrint("r");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IWOTH) {
+  			AshellPrint("w");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IXOTH) {
+  			AshellPrint("w");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		AshellPrint(" ");
+  		AshellPrint(entry->d_name);
+  		AshellPrint("\n");
+  		entry = readdir(dir);
 
-	}
+  	}
   }
 };
 
 void ls(){
   DIR* dir;
   struct dirent *entry;
-  //dir = opendir(get_current_dir_name());
+  dir = opendir(get_current_dir_name());
   if (NULL != dir){
-	entry = readdir(dir);
-	// Set the buffer for stat here
-	struct stat statbuff; //I think segfaults happen here?
-	while (NULL != entry){
-		stat(entry->d_name, &statbuff);
-		if (S_ISDIR(statbuff.st_mode)){
-			AshellPrint("d");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IRUSR) {
-			AshellPrint("r");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IWUSR) {
-			AshellPrint("w");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IXUSR) {
-			AshellPrint("x");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IRGRP) {
-			AshellPrint("r");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IWGRP) {
-			AshellPrint("w");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IXGRP) {
-			AshellPrint("x");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IROTH) {
-			AshellPrint("r");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IWOTH) {
-			AshellPrint("w");
-		}
-		else {
-			AshellPrint("-");
-		}
-		if (statbuff.st_mode & S_IXOTH) {
-			AshellPrint("w");
-		}
-		else {
-			AshellPrint("-");
-		}
-		AshellPrint(" ");
-		AshellPrint(entry->d_name);
-		AshellPrint("\n");
-		entry = readdir(dir);
+  	entry = readdir(dir);
+  	// Set the buffer for stat here
+  	struct stat statbuff; //I think segfaults happen here?
+  	while (NULL != entry){
+  		stat(entry->d_name, &statbuff);
+  		if (S_ISDIR(statbuff.st_mode)){
+  			AshellPrint("d");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IRUSR) {
+  			AshellPrint("r");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IWUSR) {
+  			AshellPrint("w");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IXUSR) {
+  			AshellPrint("x");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IRGRP) {
+  			AshellPrint("r");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IWGRP) {
+  			AshellPrint("w");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IXGRP) {
+  			AshellPrint("x");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IROTH) {
+  			AshellPrint("r");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IWOTH) {
+  			AshellPrint("w");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		if (statbuff.st_mode & S_IXOTH) {
+  			AshellPrint("w");
+  		}
+  		else {
+  			AshellPrint("-");
+  		}
+  		AshellPrint(" ");
+  		AshellPrint(entry->d_name);
+  		AshellPrint("\n");
+  		entry = readdir(dir);
 
+  	}
+  }
+};
+
+std::vector<std::string> ff(const char* filename, const char* directory, const char* newdir){
+	std::vector<std::string> vec;
+  	DIR* dir;
+  	struct dirent *entry;
+  	struct stat statbuff;
+	// Start by opening the directory that we're at, or attempting to
+	if (NULL != newdir){
+		chdir(newdir);
 	}
-  }
+	else {
+		if (chdir(directory)==-1){
+			AshellPrint("Error changing directory \n");
+			return vec;
+		}
+	}
+	//Open the directory
+	dir = opendir(get_current_dir_name());
+	//Start reading from it
+	entry = readdir(dir);
+	while (entry != NULL){ //So long as we have read something
+		stat(entry->d_name, &statbuff);
+		if (0==strcmp(filename, entry->d_name)){
+			//Add it to vector?
+			std::string slash = "/";
+			std::string fileloc;
+			if (newdir == NULL){
+				fileloc = directory + slash + filename;
+			}
+			else{
+				fileloc = directory + slash + newdir +slash + filename;
+			}
+			vec.push_back(fileloc);
+			entry = readdir(dir);
+		}
+		else if ((0 == strcmp(".", entry->d_name)) ||(0 == strcmp("..", entry->d_name))){
+			entry = readdir(dir); //Read the next entry
+		}
+		else if (S_ISDIR(statbuff.st_mode)){
+			const char* saveddir = get_current_dir_name();
+			if (chdir(entry->d_name)==-1){
+				//Can't open the file
+			}
+			else{
+				//Open it, and check what happens
+				std::vector <std::string> retvec = ff(filename, directory, entry->d_name);
+				for(int i=0; i<retvec.size(); ++i){
+					vec.push_back(retvec[i]);
+				}
+			}
+			chdir(saveddir);
+			entry = readdir(dir);
+		}
+		else{
+			entry = readdir(dir);
+		}
+	}
+
+	// Should now be in the proper directory, or have returned by now
+	return vec;
 };
 
-char* ff(char* filename){
-//Might need to return a container or something
-  DIR* dir;
-  struct dirent *entry;
-  //dir = opendir(get_current_dir_name());
-  if (NULL != dir){
-  entry = readdir(dir);
-  struct stat statbuff;
-    while (NULL != entry){
-      // Check for directorys first
-      stat(entry->d_name, &statbuff);
-      if (S_ISDIR(statbuff.st_mode)){
-          //chdir into that dir
-          AshellPrint(ff(filename));
-      }
-      if (entry->d_name == filename){
-        //the current directory
-      }
-    }
-  }
-  // Loop through each one of the files
-  // If it is a directory
-  //  chdir into it, and recurse on it
-  // If it is a file
-      // If it filename == looked for Filename
-      // return that file. Since there can be only one
-};
-*/
 //convert a string
 //https://www.geeksforgeeks.org/how-to-convert-a-single-character-to-string-in-cpp/
 std::string charString (char x){
@@ -378,7 +409,6 @@ int size_of(char *array){
     }
     return i;
 }
-
 int exec(char ** seperated){
 	std::cout <<"In exec  "  <<"\n";
 	pid_t pid;
@@ -424,8 +454,6 @@ int exec(char ** seperated){
 
 
 }
-
-//Pass in an array of seperated commands to run
 void CallPrograms(char **seperated, int num_args){
     char * run_program = seperated[0]; //the first argument is the program to run
 
