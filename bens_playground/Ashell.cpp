@@ -436,7 +436,6 @@ void parse(char *prog, char **parsed){
     char split_memory[110];
     char * split = split_memory;
     char * seperated[15] = {0}; //initialize to zero or seg fault in ls call
-    //std::cout <<"\n"<< seperated[1] <<"\n";
 
     //http://www.cplusplus.com/reference/cstring/strtok/
     split = strtok(prog, " ");
@@ -459,6 +458,7 @@ void parse(char *prog, char **parsed){
 }
 
 void ReadAndParseCmd() {
+	std::string audible_bell = charString('\a'); //audible bell
 
     bool end_line = false;
     int max_size = 512;  	//TODO: switch to buffer or malloc system if necessary
@@ -512,8 +512,12 @@ void ReadAndParseCmd() {
         //ARROW CASE *---
         else if (arrow_flag && 0x5B != char_read){
 
-            if(0x41 == char_read){
+            if(0x41 == char_read && num_lines != 0){
                 //UPARROW
+
+
+
+
 
 				//Delete old command
                 for(int n = 0; n < num_chars; n++){ 
@@ -526,7 +530,11 @@ void ReadAndParseCmd() {
 
                 arrow_flag = false;		//out of arrow
             }
-            else if(0x42 == char_read){
+			else if(0x41 == char_read && num_lines == 0){
+				//Audible bell up
+				AshellPrint(audible_bell);
+			}
+            else if(0x42 == char_read && num_lines != num_lines_tot-1){
                 //DOWNARROW
 
 				//Delete old command
@@ -540,6 +548,10 @@ void ReadAndParseCmd() {
 
                 arrow_flag = false;		//out of arrow
             }
+			else if(0x42 == char_read && num_lines == num_lines_tot-1){
+				//Audible bell down
+				AshellPrint(audible_bell);
+			}
             else if(0x43 == char_read){
                 //RIGHTARROW
                 arrow_flag = false;
@@ -548,9 +560,7 @@ void ReadAndParseCmd() {
                 //LEFTARROW
                 arrow_flag = false;
             }
-            else{
-                //ERROR, shouldn't happen
-            }
+
 
 
         }
