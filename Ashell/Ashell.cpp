@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include <vector>
 #include <typeinfo>
+#include <sys/wait.h> //for waitpid(3)
 //from noncanmode.c
 void ResetCanonicalMode(int fd, struct termios *savedattributes){
     tcsetattr(fd, TCSANOW, savedattributes);
@@ -409,9 +410,52 @@ int size_of(char *array){
     }
     return i;
 }
+int exec(char ** seperated){
+        std::cout <<"In exec  "  <<"\n";
+        pid_t pid;
+        pid_t parent_pid;
+        pid_t child_pid;
+        pid_t wait;
+        int status;
+        std::cout <<"process ID pre fork:  "  << pid <<"\n";
 
+        pid = fork(); //two process running
+
+        //std::cout <<"process ID  "  << pid <<"\n";
+
+        //child
+        //http://man7.org/linux/man-pages/man2/getpid.2.html
+        if(pid == -1){
+                std::cout <<"fork error "  << pid <<"\n";
+                //exit();
+        }
+        else if (pid == 0){
+                //child process: exec
+                std::cout <<"child process: " <<"\n";
+                std::cout <<"child: "  << getpid() << " parent: "<< getppid()<<"\n";
+                std::cout <<"exec: "  << execvp(seperated[0], seperated)<<"\n"; //if returns, error
+
+                //getpid() returns PID of calling process
+                //getppid() returns PID of the parent of the calling process (ID of parent, or ID of reparented)
+        }
+        else{
+                //parent process: child executed, parent wait for child to finish
+                std::cout <<"parent process: " <<"\n";
+                std::cout <<"parent: "  << getpid() << " child: "<< pid<<"\n";
+                waitpid(pid, &status, WEXITED);
+                std::cout <<"child returned, status: "  << status << "\n";
+
+        }
+
+        //error
+
+        //parent
+                //wait for it to finish
+
+
+}
 void CallPrograms(char **seperated, int num_args){
-    char * run_program = seperated[0];
+    char * run_program = seperated[0]; //the first argument is the program to run
 
     if(run_program[0] == 'c' && run_program[1] == 'd' && run_program[2] == '\0'){
         std::cout <<"Execute CD "<<"\n";
@@ -421,26 +465,37 @@ void CallPrograms(char **seperated, int num_args){
         //cd(directory);
     }
     else if(run_program[0] == 'l' && run_program[1] == 's' && run_program[2] == '\0'){
-        std::cout <<"Execute LS "<<"\n";
-        //TODO: ls(directory);
+
+        if(num_args>0){ //fixes seg fault
+            char * directory = seperated[1];
+            //std::cout <<"Passing in:  "<< directory <<"\n";
+            //char * directory;
+            std::cout << "\n"<<"Executing LS... "<< "Directory: "<< directory<<"\n";
+            //ls(directory);
+        }
+        else{
+            std::cout << "\n"<<"Executing LS... "<< "No Directory"<<"\n";
+            //ls(" "); //IF NO ARGS, PASS IN NOTHING
+        }
+
     }
     else if(run_program[0] == 'p' && run_program[1] == 'w' && run_program[2] == 'd' && run_program[3] == '\0'){
-        std::cout <<"Execute PWD "<<"\n";
+        //std::cout <<"Execute PWD "<<"\n";
         //pwd();
     }
     else if(run_program[0] == 'e' && run_program[1] == 'x' && run_program[2] == 'i' && run_program[3] == 't' && run_program[4] == '\0'){
         std::cout <<"Execute EXIT "<<"\n";
-        exit();
+        //exit();
     }
     else if(run_program[0] == 'f' && run_program[1] == 'f' && run_program[2] == '\0'){
         std::cout <<"Execute ff "<<"\n";
         char * filename = seperated[1];
-        std::cout <<"Filename:  "<< filename <<"\n";
-        //TODO: ff(filename);
+        //std::cout <<"Filename:  "<< filename <<"\n";
+        //ff(filename);
     }
     else{
-        std::cout <<"Run Exec(" << run_program<<");" <<"\n";
-        //TODO: exec(program_name)
+        std::cout <<"\n"<<"Run Exec(" << run_program<<");" <<"\n";
+        //exec(seperated);
     }
 
 
@@ -450,11 +505,10 @@ void parse(char *prog, char **parsed){
     //Parsing char array received, basically a split line function.
     //Currently seperates with ' ' TODO work with any character
 
-
     int i = 0;
     char split_memory[110];
     char * split = split_memory;
-    char * seperated[15];
+    char * seperated[15] = {0}; //initialize to zero or seg fault in ls call
 
     //http://www.cplusplus.com/reference/cstring/strtok/
     split = strtok(prog, " ");
@@ -469,8 +523,6 @@ void parse(char *prog, char **parsed){
     }
     seperated[i] = split;
 
-
-
     char * run_program = seperated[0];
     int num_args = i -1;
 
@@ -479,30 +531,37 @@ void parse(char *prog, char **parsed){
 }
 
 void ReadAndParseCmd() {
+        std::string audible_bell = charString('\a'); //audible bell
 
     bool end_line = false;
-    int max_size = 512;  //TODO: switch to buffer or malloc system if necessary
-    int i = 0;
+    int max_size = 512;  	//TODO: switch to buffer or malloc system if necessary
+    int num_chars = 0;		//the num of chars in a line
+    int num_lines;
+        int num_lines_tot;
 
     char test_array[100] = "12345678";
 
     size_t bytes_read = 0;
 
-    //if you do this it creates in_one in read-only memory, can't change
-    //char *in_one = "one-";
 
-    char prog_mem[100] = ""; //should be large?
-    char args_mem[100] = ""; //should b 16 (max can show on terminal)?
+        //Setting up memory
+    char prog_mem[100] = ""; //TODO: find max size
+    char args_mem[100] = ""; //TODO: is this read-only memory
 
-    char char_read = '\0';
-    char * prog = prog_mem; //the program contains all input
-    char * parsed; //to contain parsed input
-    char *args = args_mem; //Input after the command/program
+
+    char * prog = prog_mem; //Array containing chars until enter hit
+    char *args = args_mem; 	//Input after the command/program
+        //char * parsed; 			//to contain parsed input
+
+    char hist[10][10];
+        char char_read = '\0';
+
+
     bool arrow_flag;
 
     int max_bytes = 1; //reads at most 1 byte at a time
 
-    //this may need to be STDIN_FILENO
+    //this may need to be STDIN_FILENO TODO
     int fd_read = 0; //this if the fd (file descriptor) for read
 
 
@@ -510,99 +569,117 @@ void ReadAndParseCmd() {
     SetNonCanonicalMode(0, &SavedTermAttributes); //from noncanmode.c
 
     while (!end_line){
-        //bytes_read is the number of bytes SUCCESSFULLY read
-        //Example: if "Ben" is typed with max_bytes being 10, 4 is returned.
-        //std::cout <<"got to while" << "\n";
-        bytes_read = read(STDIN_FILENO, &char_read, max_bytes);
+
+        int key_location = num_chars-1; //key location is the # of keys pressed in one line
+        hist[num_lines_tot][key_location] = prog[key_location]; //sets history on each key press
+
+        bytes_read = read(STDIN_FILENO, &char_read, max_bytes); //STDIN_FILENO may just be 1 TODO
 
 
-        //if the input is readable
+        //EOT (end of transit) CASE *---
         if(0x04 == char_read){ // C-d
             std::cout <<"its something else entirely..." << "\n";
             break;
         }
-        //BACKSPACE CASE
-        else if (0x7F == char_read){
-            //std::cout <<"got to if" << "\n";
-            //std::cout <<"got to if" << "\n";
-            AshellPrint("\b \b"); //this backspaces
-            prog[i] = char_read;
-            //std::cout <<"this comes out: " << prog << "\n";
 
-        }
-        //ARROW CASE
+        //ARROW CASE *---
         else if (arrow_flag && 0x5B != char_read){
 
-            //std::cout <<"ARROW2" << "\n";
-
-
-            if(0x41 == char_read){
+            if(0x41 == char_read && num_lines != 0){
                 //UPARROW
-                AshellPrint("UPARROW");
-                arrow_flag = false;
+
+
+
+
+
+                                //Delete old command
+                for(int n = 0; n < num_chars; n++){
+                    AshellPrint("\b \b");
+                }
+
+                                num_lines--;			//set line number
+                                prog = hist[num_lines];	//set program to history
+                AshellPrint(prog);		//print program
+
+                arrow_flag = false;		//out of arrow
             }
-            else if(0x42 == char_read){
+                        else if(0x41 == char_read && num_lines == 0){
+                                //Audible bell up
+                                AshellPrint(audible_bell);
+                        }
+            else if(0x42 == char_read && num_lines != num_lines_tot){
                 //DOWNARROW
-                AshellPrint("DOWNARROW");
-                arrow_flag = false;
+
+                                //Delete old command
+                for(int n = 0; n < num_chars; n++){
+                    AshellPrint("\b \b");
+                }
+
+                                num_lines++;			//set line number
+                                prog = hist[num_lines];	//set program to history
+                AshellPrint(prog);		//print program
+
+                arrow_flag = false;		//out of arrow
             }
+                        else if(0x42 == char_read && num_lines == num_lines_tot){
+                                //Audible bell down
+                                AshellPrint(audible_bell);
+                        }
             else if(0x43 == char_read){
                 //RIGHTARROW
-                AshellPrint("RIGHTARROW");
                 arrow_flag = false;
             }
             else if(0x44 == char_read){
                 //LEFTARROW
-                AshellPrint("LEFTARROW");
                 arrow_flag = false;
             }
-            else{
-                //ERROR, shouldn't happen
-            }
+
 
 
         }
         else if (arrow_flag && 0x5B == char_read){
-
+                        //Possibly an arrow key, set flag true and check next char above
             arrow_flag = true;
-
         }
 
+                //BACKSPACE CASE *---
+        else if (0x7F == char_read && num_chars > 0){
+            AshellPrint("\b \b"); 	//outputs backspace
+                        num_chars= num_chars - 2;
+                        //std::cout <<"Passing in:  " <<"\n";
+
+                        //std::cout<<num_chars; 					//corrects number of chars entered
+            prog[num_chars] = char_read;	//replaces location in memory to backspace (maybe should be '\0'?)
+        }
+                else if (0x7F == char_read && num_chars <= 0){
+                        AshellPrint(audible_bell);
+                        num_chars--;
+        }
+
+        //STANDARD CASE (if the char can be printed) *---
         else if (isprint(char_read)){
-            //these lines don't fix it
-            prog[i] = char_read;
-            //char dec_to_char = prog[i];
-            //std::cout << "prog[i]: " << prog[i] <<"\n"; //getting the decimal representation
-            std::string str1 = charString(prog[i]);
-            AshellPrint(str1);
-
+            prog[num_chars] = char_read;					//sets location in memory to the printable char
+            std::string str1 = charString(prog[num_chars]); //converts prog[i] to string so it can work with AshellPrint
+            AshellPrint(str1);								//prints char to shell
         }
-        //ENTER CHASE
+        //ENTER CASE *---
         else if (0x0A == char_read) {
-            std::cout <<"got to end line - so we think 1" << "\n";
+                        //exit the loop
             end_line = true;
-            //always a null character at the end of the string
-            //prog[i] = '\0';
-
         }
+                //ARROW CASE	*---
         else{
-            //std::cout <<"char(" << char_read<<")";
-            //ARROW CASE
-            //AshellPrint("ARROW");
+                        //Possibly an arrow key, set flag true and check next char above
             arrow_flag = true;
-            //end_line = true;
-            //always a null character at the end of the string
-            //prog[i] = '\0';
-
         }
-        //std::cout <<"out of if" << "\n";
-        i++;
+
+        num_chars++; //while enter not pressed, read the next char
+
 
     }
-    ResetCanonicalMode(STDIN_FILENO, &SavedTermAttributes);
-    //std::cout <<"prog:  " << prog << "    args:   " << args<< "\n\n";
-    parse(prog,&args);
-    //std::cout <<"Done."<< "\n";
-
+    num_lines++;
+        num_lines_tot++;	//keep track of total number of lines
+    ResetCanonicalMode(STDIN_FILENO, &SavedTermAttributes); //reset canon mode
+    parse(prog,&args); //Parse the program
 
 }
