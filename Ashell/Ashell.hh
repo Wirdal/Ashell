@@ -37,7 +37,7 @@ void ls(char* directory);
 void ls(std::string directory);
 void ls();
 
-std::vector<char*> ff(const char* filename, const char* directory);
+std::vector<std::string> ff(const char* filename, const char* directory, const char* newdir);
 
 // Reading
 

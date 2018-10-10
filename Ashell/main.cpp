@@ -10,10 +10,12 @@ int main (int argc, char *argv[]) {
 
   std::cout << "Chaning current dir " << get_current_dir_name()<< "\n";
   chdir(get_current_dir_name());
-  std::vector<char*> vec;
-  vec = ff(file, dir);
+  std::vector<std::string> vec;
+  vec = ff(file, dir, NULL);
   for(int i=0; i<vec.size(); ++i){
-    std::cout << "printing found locations " <<  vec[i] <<   "\n";
+    AshellPrint("Found locations in ");
+    AshellPrint(vec[i]);
+    AshellPrint("\n");
    }
   //Main loops goes here
   //While true

@@ -334,15 +334,14 @@ void ls(){
   }
 };
 
-std::vector<char*> ff(const char* filename, const char* directory, const char* localdir){
-	std::vector<char*> vec;
+std::vector<std::string> ff(const char* filename, const char* directory, const char* newdir){
+	std::vector<std::string> vec;
   	DIR* dir;
   	struct dirent *entry;
   	struct stat statbuff;
-	// Start by opening the directory that we're att, or attempting to
-	if (NULL == directory){
-		//Do nothing;
-		;
+	// Start by opening the directory that we're at, or attempting to
+	if (NULL != newdir){
+		chdir(newdir);
 	}
 	else {
 		if (chdir(directory)==-1){
@@ -360,9 +359,14 @@ std::vector<char*> ff(const char* filename, const char* directory, const char* l
 		if (0==strcmp(filename, entry->d_name)){
 			std::cout <<"See our file \n";
 			//Add it to vector?
-			char dircpy[5000];
-			strcpy(dircpy,directory);
-			char* fileloc =  strcat(strcat(dircpy, "/"),filename);
+			std::string slash = "/";
+			std::string fileloc;
+			if (newdir == NULL){
+				fileloc = directory + slash + filename;
+			}
+			else{
+				fileloc = directory + slash + newdir +slash + filename;
+			}
 			vec.push_back(fileloc);
 			entry = readdir(dir);
 		}
@@ -372,17 +376,19 @@ std::vector<char*> ff(const char* filename, const char* directory, const char* l
 		}
 		else if (S_ISDIR(statbuff.st_mode)){
 			std::cout << "See a dir \n";
+			const char* saveddir = get_current_dir_name();
 			if (chdir(entry->d_name)==-1){
 				//Can't open the file
-				;
 			}
 			else{
 				//Open it, and check what happens
-				std::vector <char*> retvec = ff(filename, NULL,);
+			std::cout << "Opened dir succesfully \n";
+				std::vector <std::string> retvec = ff(filename, directory, entry->d_name);
 				for(int i=0; i<retvec.size(); ++i){
-						vec.push_back(retvec[i]);
+					vec.push_back(retvec[i]);
 				}
 			}
+			chdir(saveddir);
 			entry = readdir(dir);
 		}
 		else{
