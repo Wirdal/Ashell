@@ -529,7 +529,8 @@ void ReadAndParseCmd() {
                     AshellPrint("\b \b"); //this backspaces
                 }
 				num_lines--;
-                AshellPrint(hist[num_lines]);
+				prog = hist[num_lines];
+                AshellPrint(prog);
 
                 //num_lines--;
                 //hist[num_lines][key_location] = prog[key_location];
@@ -547,7 +548,8 @@ void ReadAndParseCmd() {
                     AshellPrint("\b \b"); //this backspaces
                 }
 				num_lines++;
-                AshellPrint(hist[num_lines]);
+				prog = hist[num_lines];
+                AshellPrint(prog);
 
 
                 //hist[num_lines][key_location] = prog[key_location];
