@@ -334,55 +334,65 @@ void ls(){
   }
 };
 
-std::vector<char*> ff(const char* filename, const char* directory){
-//Might need to return a container or something
-  std::vector<char*> vec;
-  DIR* dir;
-  struct dirent *entry;
-  struct stat statbuff;
-  char dot[2] = ".";
-  char dotdot[3] = "..";
-
-  if (NULL == directory){
-    chdir(get_current_dir_name());
-  }
-  else{
-    if (-1 == chdir(directory)){
-	    AshellPrint("Error changing directory");
-  	    AshellPrint("\n");
-	    return vec;
-    }
-  }
-
-  dir = opendir(get_current_dir_name());
-  entry = readdir(dir);
-
-  while (NULL != entry){
-    stat(entry->d_name, &statbuff);
-    if (S_ISDIR(statbuff.st_mode)){
-        if ((0==strcmp(dot, entry->d_name))|| (0==strcmp(dotdot, entry->d_name))){
-        }
-		else {
- 	  		// its a directory. Call this function on it
-	        // Add the vector to it and return ff(filename, entry->d_aname)
-	        std::vector <char*> retvec = ff(filename,entry->d_name);
-        	vec.insert(vec.end(), retvec.begin(), retvec.end());
+std::vector<char*> ff(const char* filename, const char* directory, const char* localdir){
+	std::vector<char*> vec;
+  	DIR* dir;
+  	struct dirent *entry;
+  	struct stat statbuff;
+	// Start by opening the directory that we're att, or attempting to
+	if (NULL == directory){
+		//Do nothing;
+		;
+	}
+	else {
+		if (chdir(directory)==-1){
+			AshellPrint("Error changing directory \n");
+			return vec;
 		}
-    }
-    else{
-      //Its a file
-      //Is it the file we are looking for?
-      if (0==strcmp(filename, entry->d_name)){
-		//Tack on filename right here
-		char dircpy[5000];
-        strcpy(dircpy, directory);
-		char* fileloc =  strcat(strcat(dircpy, "/"),filename);
-        vec.push_back(fileloc);
-      }
-    }
-    entry = readdir(dir);
-  }
-  return vec;
+	}
+	//Open the directory
+	dir = opendir(get_current_dir_name());
+	//Start reading from it
+	entry = readdir(dir);
+	while (entry != NULL){ //So long as we have read something
+		stat(entry->d_name, &statbuff);
+		std::cout << "See " << entry->d_name <<" ";
+		if (0==strcmp(filename, entry->d_name)){
+			std::cout <<"See our file \n";
+			//Add it to vector?
+			char dircpy[5000];
+			strcpy(dircpy,directory);
+			char* fileloc =  strcat(strcat(dircpy, "/"),filename);
+			vec.push_back(fileloc);
+			entry = readdir(dir);
+		}
+		else if ((0 == strcmp(".", entry->d_name)) ||(0 == strcmp("..", entry->d_name))){
+			std::cout << "See a . or .. \n";
+			entry = readdir(dir); //Read the next entry
+		}
+		else if (S_ISDIR(statbuff.st_mode)){
+			std::cout << "See a dir \n";
+			if (chdir(entry->d_name)==-1){
+				//Can't open the file
+				;
+			}
+			else{
+				//Open it, and check what happens
+				std::vector <char*> retvec = ff(filename, NULL,);
+				for(int i=0; i<retvec.size(); ++i){
+						vec.push_back(retvec[i]);
+				}
+			}
+			entry = readdir(dir);
+		}
+		else{
+			std::cout<< "Saw a file, not the one we care about \n";
+			entry = readdir(dir);
+		}
+	}
+
+	// Should now be in the proper directory, or have returned by now
+	return vec;
 };
 
 //convert a string
