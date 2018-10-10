@@ -471,26 +471,25 @@ void ReadAndParseCmd() {
 
     size_t bytes_read = 0;
 
-    //if you do this it creates in_one in read-only memory, can't change
-    //char *in_one = "one-";
+    
+	//Setting up memory
+    char prog_mem[100] = ""; //TODO: find max size
+    char args_mem[100] = ""; //TODO: is this read-only memory
+	
 
-    char prog_mem[100] = ""; //should be large?
-    char args_mem[100] = ""; //should b 16 (max can show on terminal)?
-    //char *hist_mem[100] ={" "}; //should b 16 (max can show on terminal)?
+    char * prog = prog_mem; //Array containing chars until enter hit
+    char *args = args_mem; 	//Input after the command/program
+//	char * parsed; 			//to contain parsed input
 
-    char char_read = '\0';
-    char * prog = prog_mem; //the program contains all input
-    char * parsed; //to contain parsed input
-    char *args = args_mem; //Input after the command/program
     char hist[10][10];
-    //char **hist = hist_mem;
+	char char_read = '\0';
 
 
     bool arrow_flag;
 
     int max_bytes = 1; //reads at most 1 byte at a time
 
-    //this may need to be STDIN_FILENO
+    //this may need to be STDIN_FILENO TODO
     int fd_read = 0; //this if the fd (file descriptor) for read
 
 
@@ -498,14 +497,11 @@ void ReadAndParseCmd() {
     SetNonCanonicalMode(0, &SavedTermAttributes); //from noncanmode.c
 
     while (!end_line){
-        //bytes_read is the number of bytes SUCCESSFULLY read
-        //Example: if "Ben" is typed with max_bytes being 10, 4 is returned.
-        //std::cout <<"prog["<<i<<"]: "<< prog[i-1] << "\n";
-        int key_location = i-1;
-        hist[num_lines_tot][key_location] = prog[key_location];
-        //std::cout <<"prog at numlines "<<num_lines<<": " << hist[num_lines][i-1] <<"\n";
-        //std::cout <<"history at numlines: "<<num_lines<<": " << hist[num_lines] <<"\n";
-        bytes_read = read(STDIN_FILENO, &char_read, max_bytes);
+
+        int key_location = i-1; //key location is the # of keys pressed in one line
+        hist[num_lines_tot][key_location] = prog[key_location]; //sets history on each key press
+
+        bytes_read = read(STDIN_FILENO, &char_read, max_bytes); //STDIN_FILENO may just be 1 TODO
 
 
         //if the input is readable
@@ -517,54 +513,42 @@ void ReadAndParseCmd() {
         //ARROW CASE
         else if (arrow_flag && 0x5B != char_read){
 
-            //std::cout <<"ARROW2" << "\n";
-
-
             if(0x41 == char_read){
                 //UPARROW
                 //AshellPrint("UP");
 
-                //backspace
-                for(int n = 0; n < i; n++){ //works by using i. Strangely also works using i - 2
-                    AshellPrint("\b \b"); //this backspaces
+				//Delete old command
+                for(int n = 0; n < i; n++){ 
+                    AshellPrint("\b \b");
                 }
-				num_lines--;
-				prog = hist[num_lines];
-                AshellPrint(prog);
 
-                //num_lines--;
-                //hist[num_lines][key_location] = prog[key_location];
+				num_lines--;			//set line number
+				prog = hist[num_lines];	//set program to history
+                AshellPrint(prog);		//print program
 
-
-
-
-                arrow_flag = false;
+                arrow_flag = false;		//out of arrow
             }
             else if(0x42 == char_read){
                 //DOWNARROW
                 //AshellPrint("DOWNARROW");
 
-                for(int n = 0; n < i; n++){ //works by using i. Strangely also works using i - 2
-                    AshellPrint("\b \b"); //this backspaces
+				//Delete old command
+                for(int n = 0; n < i; n++){ 
+                    AshellPrint("\b \b"); 
                 }
-				num_lines++;
-				prog = hist[num_lines];
-                AshellPrint(prog);
 
+				num_lines++;			//set line number
+				prog = hist[num_lines];	//set program to history
+                AshellPrint(prog);		//print program
 
-                //hist[num_lines][key_location] = prog[key_location];
-
-
-                arrow_flag = false;
+                arrow_flag = false;		//out of arrow
             }
             else if(0x43 == char_read){
                 //RIGHTARROW
-                //AshellPrint("RIGHTARROW");
                 arrow_flag = false;
             }
             else if(0x44 == char_read){
                 //LEFTARROW
-                //AshellPrint("LEFTARROW");
                 arrow_flag = false;
             }
             else{
@@ -583,8 +567,9 @@ void ReadAndParseCmd() {
             //std::cout <<"back" << "\n";
             //std::cout <<"got to if" << "\n";
             AshellPrint("\b \b"); //this backspaces
+			i--;
             prog[i] = char_read;
-			std::cout <<"back" << "\n";
+			
             //std::cout <<"this comes out: " << prog << "\n";
 
         }
