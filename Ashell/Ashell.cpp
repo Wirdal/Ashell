@@ -355,9 +355,7 @@ std::vector<std::string> ff(const char* filename, const char* directory, const c
 	entry = readdir(dir);
 	while (entry != NULL){ //So long as we have read something
 		stat(entry->d_name, &statbuff);
-		std::cout << "See " << entry->d_name <<" ";
 		if (0==strcmp(filename, entry->d_name)){
-			std::cout <<"See our file \n";
 			//Add it to vector?
 			std::string slash = "/";
 			std::string fileloc;
@@ -371,18 +369,15 @@ std::vector<std::string> ff(const char* filename, const char* directory, const c
 			entry = readdir(dir);
 		}
 		else if ((0 == strcmp(".", entry->d_name)) ||(0 == strcmp("..", entry->d_name))){
-			std::cout << "See a . or .. \n";
 			entry = readdir(dir); //Read the next entry
 		}
 		else if (S_ISDIR(statbuff.st_mode)){
-			std::cout << "See a dir \n";
 			const char* saveddir = get_current_dir_name();
 			if (chdir(entry->d_name)==-1){
 				//Can't open the file
 			}
 			else{
 				//Open it, and check what happens
-			std::cout << "Opened dir succesfully \n";
 				std::vector <std::string> retvec = ff(filename, directory, entry->d_name);
 				for(int i=0; i<retvec.size(); ++i){
 					vec.push_back(retvec[i]);
@@ -392,7 +387,6 @@ std::vector<std::string> ff(const char* filename, const char* directory, const c
 			entry = readdir(dir);
 		}
 		else{
-			std::cout<< "Saw a file, not the one we care about \n";
 			entry = readdir(dir);
 		}
 	}
