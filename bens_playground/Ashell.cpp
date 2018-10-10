@@ -379,6 +379,32 @@ int size_of(char *array){
     return i;
 }
 
+int exec(char ** seperated){
+	std::cout <<"In exec  "  <<"\n";
+	pid_t pid;
+	pid_t wait;
+	std::cout <<"process ID pre fork:  "  << pid <<"\n";
+
+	pid = fork();
+
+	//std::cout <<"process ID  "  << pid <<"\n";
+
+	//child
+	if (pid == 0){
+		std::cout <<"child: "  << pid <<"\n";
+	}
+	else{
+		std::cout <<"parent: "  << pid <<"\n";
+
+	}
+
+	//error
+
+	//parent
+		//wait for it to finish
+
+
+}
 
 //Pass in an array of seperated commands to run
 void CallPrograms(char **seperated, int num_args){
@@ -422,7 +448,7 @@ void CallPrograms(char **seperated, int num_args){
     }
     else{
         std::cout <<"\n"<<"Run Exec(" << run_program<<");" <<"\n";
-        //TODO: exec(program_name)
+        exec(seperated);
     }
 
 
