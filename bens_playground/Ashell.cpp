@@ -385,9 +385,10 @@ int exec(char ** seperated){
 	pid_t parent_pid;
 	pid_t child_pid;
 	pid_t wait;
+	int status;
 	std::cout <<"process ID pre fork:  "  << pid <<"\n";
 
-	pid = fork();
+	pid = fork(); //two process running
 
 	//std::cout <<"process ID  "  << pid <<"\n";
 
@@ -395,17 +396,24 @@ int exec(char ** seperated){
 	//http://man7.org/linux/man-pages/man2/getpid.2.html
 	if(pid == -1){
 		std::cout <<"fork error "  << pid <<"\n";
+		//exit();
 	}
 	else if (pid == 0){
+		//child process: exec
 		std::cout <<"child process: " <<"\n";
 		std::cout <<"child: "  << getpid() << " parent: "<< getppid()<<"\n";
+		std::cout <<"exec: "  << execvp(seperated[0], seperated)<<"\n"; //if returns, error
+		
 		//getpid() returns PID of calling process
 		//getppid() returns PID of the parent of the calling process (ID of parent, or ID of reparented)
 	}
 	else{
-		//
+		//parent process: child executed, parent wait for child to finish
 		std::cout <<"parent process: " <<"\n";
-		std::cout <<"parent: "  << getpid() << " parent: "<< getppid()<<"\n";
+		std::cout <<"parent: "  << getpid() << " child: "<< pid<<"\n";
+		waitpid(pid, &status, WEXITED);
+		printf("The child exited with return code %d\n", status);
+		std::cout <<"child returned, status: "  << status << "\n";
 
 	}
 
