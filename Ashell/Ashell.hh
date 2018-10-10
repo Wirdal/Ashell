@@ -24,6 +24,8 @@ int AshellOpen(const char *path, int flags, .../*, mode_t mode*/);
 //Size_t, number of bytes to be read from the file
 size_t AshellRead(int fd, void *buf, size_t count); //Maybe will need more?
 
+int exec(char ** seperated);
+
 // Shell commands
 
 
