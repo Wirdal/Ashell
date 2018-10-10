@@ -382,6 +382,8 @@ int size_of(char *array){
 int exec(char ** seperated){
 	std::cout <<"In exec  "  <<"\n";
 	pid_t pid;
+	pid_t parent_pid;
+	pid_t child_pid;
 	pid_t wait;
 	std::cout <<"process ID pre fork:  "  << pid <<"\n";
 
@@ -390,11 +392,20 @@ int exec(char ** seperated){
 	//std::cout <<"process ID  "  << pid <<"\n";
 
 	//child
-	if (pid == 0){
-		std::cout <<"child: "  << pid <<"\n";
+	//http://man7.org/linux/man-pages/man2/getpid.2.html
+	if(pid == -1){
+		std::cout <<"fork error "  << pid <<"\n";
+	}
+	else if (pid == 0){
+		std::cout <<"child process: " <<"\n";
+		std::cout <<"child: "  << getpid() << " parent: "<< getppid()<<"\n";
+		//getpid() returns PID of calling process
+		//getppid() returns PID of the parent of the calling process (ID of parent, or ID of reparented)
 	}
 	else{
-		std::cout <<"parent: "  << pid <<"\n";
+		//
+		std::cout <<"parent process: " <<"\n";
+		std::cout <<"parent: "  << getpid() << " parent: "<< getppid()<<"\n";
 
 	}
 
