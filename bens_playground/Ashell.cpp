@@ -65,16 +65,16 @@ void AshellPrint(int output){
 
 size_t AshellRead(int fd, void *buf, size_t count){
 //TODO
-};
+}
 
 int AshellOpen(const char *path, int flags, .../*, mode_t mode*/){
 //TODO
-};
+}
 // Shell commands
-
+/*
 
 void pwd(){
-	char *path = get_current_dir_name();
+	//char *path = get_current_dir_name();
 	AshellPrint(path);
 	free(path);
 	AshellPrint("\n");
@@ -260,7 +260,7 @@ void ls(std::string directory){
 void ls(){
   DIR* dir;
   struct dirent *entry;
-  dir = opendir(get_current_dir_name());
+  //dir = opendir(get_current_dir_name());
   if (NULL != dir){
 	entry = readdir(dir);
 	// Set the buffer for stat here
@@ -340,7 +340,7 @@ char* ff(char* filename){
 //Might need to return a container or something
   DIR* dir;
   struct dirent *entry;
-  dir = opendir(get_current_dir_name());
+  //dir = opendir(get_current_dir_name());
   if (NULL != dir){
   entry = readdir(dir);
   struct stat statbuff;
@@ -363,7 +363,7 @@ char* ff(char* filename){
       // If it filename == looked for Filename
       // return that file. Since there can be only one
 };
-
+*/
 //convert a string
 //https://www.geeksforgeeks.org/how-to-convert-a-single-character-to-string-in-cpp/
 std::string charString (char x){
@@ -387,7 +387,7 @@ void CallPrograms(char **seperated, int num_args){
 
         char * directory = seperated[1]; //TODO: check to see if it exists
         std::cout <<"directory "<< directory <<"\n";
-        cd(directory);
+        //cd(directory);
     }
     else if(run_program[0] == 'l' && run_program[1] == 's' && run_program[2] == '\0'){
 
@@ -396,27 +396,27 @@ void CallPrograms(char **seperated, int num_args){
             //std::cout <<"Passing in:  "<< directory <<"\n";
             //char * directory;
             std::cout << "\n"<<"Executing LS... "<< "Directory: "<< directory<<"\n";
-            ls(directory);
+            //ls(directory);
         }
         else{
             std::cout << "\n"<<"Executing LS... "<< "No Directory"<<"\n";
-            ls(" "); //IF NO ARGS, PASS IN NOTHING
+            //ls(" "); //IF NO ARGS, PASS IN NOTHING
         }
 
     }
     else if(run_program[0] == 'p' && run_program[1] == 'w' && run_program[2] == 'd' && run_program[3] == '\0'){
         //std::cout <<"Execute PWD "<<"\n";
-        pwd();
+        //pwd();
     }
     else if(run_program[0] == 'e' && run_program[1] == 'x' && run_program[2] == 'i' && run_program[3] == 't' && run_program[4] == '\0'){
         std::cout <<"Execute EXIT "<<"\n";
-        exit();
+        //exit();
     }
     else if(run_program[0] == 'f' && run_program[1] == 'f' && run_program[2] == '\0'){
         std::cout <<"Execute ff "<<"\n";
         char * filename = seperated[1];
         //std::cout <<"Filename:  "<< filename <<"\n";
-        ff(filename);
+        //ff(filename);
     }
     else{
         std::cout <<"\n"<<"Run Exec(" << run_program<<");" <<"\n";
@@ -465,6 +465,7 @@ void ReadAndParseCmd() {
     int max_size = 512;  //TODO: switch to buffer or malloc system if necessary
     int i = 0;
     int num_lines;
+	int num_lines_tot;
 
     char test_array[100] = "12345678";
 
@@ -501,7 +502,7 @@ void ReadAndParseCmd() {
         //Example: if "Ben" is typed with max_bytes being 10, 4 is returned.
         //std::cout <<"prog["<<i<<"]: "<< prog[i-1] << "\n";
         int key_location = i-1;
-        hist[num_lines][key_location] = prog[key_location];
+        hist[num_lines_tot][key_location] = prog[key_location];
         //std::cout <<"prog at numlines "<<num_lines<<": " << hist[num_lines][i-1] <<"\n";
         //std::cout <<"history at numlines: "<<num_lines<<": " << hist[num_lines] <<"\n";
         bytes_read = read(STDIN_FILENO, &char_read, max_bytes);
@@ -512,15 +513,7 @@ void ReadAndParseCmd() {
             std::cout <<"its something else entirely..." << "\n";
             break;
         }
-        //BACKSPACE CASE
-        else if (0x7F == char_read){
-            //std::cout <<"got to if" << "\n";
-            //std::cout <<"got to if" << "\n";
-            AshellPrint("\b \b"); //this backspaces
-            prog[i] = char_read;
-            //std::cout <<"this comes out: " << prog << "\n";
-
-        }
+        
         //ARROW CASE
         else if (arrow_flag && 0x5B != char_read){
 
@@ -532,14 +525,14 @@ void ReadAndParseCmd() {
                 //AshellPrint("UP");
 
                 //backspace
-                for(int n = 0; n < 10; n++){ //works by using i. Strangely also works using i - 2
+                for(int n = 0; n < i; n++){ //works by using i. Strangely also works using i - 2
                     AshellPrint("\b \b"); //this backspaces
                 }
+				num_lines--;
+                AshellPrint(hist[num_lines]);
 
-                AshellPrint(hist[num_lines - 1]);
-
-                num_lines--;
-                hist[num_lines][key_location] = prog[key_location];
+                //num_lines--;
+                //hist[num_lines][key_location] = prog[key_location];
 
 
 
@@ -550,14 +543,14 @@ void ReadAndParseCmd() {
                 //DOWNARROW
                 //AshellPrint("DOWNARROW");
 
-                for(int n = 0; n < 10; n++){ //works by using i. Strangely also works using i - 2
+                for(int n = 0; n < i; n++){ //works by using i. Strangely also works using i - 2
                     AshellPrint("\b \b"); //this backspaces
                 }
+				num_lines++;
+                AshellPrint(hist[num_lines]);
 
-                AshellPrint(hist[num_lines+1]);
 
-                num_lines++;
-                hist[num_lines][key_location] = prog[key_location];
+                //hist[num_lines][key_location] = prog[key_location];
 
 
                 arrow_flag = false;
@@ -583,7 +576,16 @@ void ReadAndParseCmd() {
             arrow_flag = true;
 
         }
+		//BACKSPACE CASE
+        else if (0x7F == char_read){
+            //std::cout <<"back" << "\n";
+            //std::cout <<"got to if" << "\n";
+            AshellPrint("\b \b"); //this backspaces
+            prog[i] = char_read;
+			std::cout <<"back" << "\n";
+            //std::cout <<"this comes out: " << prog << "\n";
 
+        }
         //STANDARD CASE
 
         else if (isprint(char_read)){
@@ -620,10 +622,9 @@ void ReadAndParseCmd() {
 
     }
     num_lines++;
+	num_lines_tot++;
     ResetCanonicalMode(STDIN_FILENO, &SavedTermAttributes);
     //std::cout <<"prog:  " << prog << "    args:   " << args<< "\n\n";
     parse(prog,&args);
     //std::cout <<"Done."<< "\n";
-
-
 }
