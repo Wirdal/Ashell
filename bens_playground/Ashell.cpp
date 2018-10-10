@@ -379,8 +379,10 @@ int size_of(char *array){
     return i;
 }
 
+
+//Pass in an array of seperated commands to run
 void CallPrograms(char **seperated, int num_args){
-    char * run_program = seperated[0];
+    char * run_program = seperated[0]; //the first argument is the program to run
 
     if(run_program[0] == 'c' && run_program[1] == 'd' && run_program[2] == '\0'){
         std::cout <<"Execute CD "<<"\n";
@@ -430,7 +432,6 @@ void parse(char *prog, char **parsed){
     //Parsing char array received, basically a split line function.
     //Currently seperates with ' ' TODO work with any character
 
-
     int i = 0;
     char split_memory[110];
     char * split = split_memory;
@@ -450,8 +451,6 @@ void parse(char *prog, char **parsed){
     }
     seperated[i] = split;
 
-
-
     char * run_program = seperated[0];
     int num_args = i -1;
 
@@ -462,8 +461,8 @@ void parse(char *prog, char **parsed){
 void ReadAndParseCmd() {
 
     bool end_line = false;
-    int max_size = 512;  //TODO: switch to buffer or malloc system if necessary
-    int i = 0;
+    int max_size = 512;  	//TODO: switch to buffer or malloc system if necessary
+    int num_chars = 0;		//the num of chars in a line
     int num_lines;
 	int num_lines_tot;
 
@@ -498,27 +497,26 @@ void ReadAndParseCmd() {
 
     while (!end_line){
 
-        int key_location = i-1; //key location is the # of keys pressed in one line
+        int key_location = num_chars-1; //key location is the # of keys pressed in one line
         hist[num_lines_tot][key_location] = prog[key_location]; //sets history on each key press
 
         bytes_read = read(STDIN_FILENO, &char_read, max_bytes); //STDIN_FILENO may just be 1 TODO
 
 
-        //if the input is readable
-        if(0x04 == char_read){ // C-d
+        //EOT (end of transit) CASE *---
+        if(0x04 == char_read){ // C-d 
             std::cout <<"its something else entirely..." << "\n";
             break;
         }
         
-        //ARROW CASE
+        //ARROW CASE *---
         else if (arrow_flag && 0x5B != char_read){
 
             if(0x41 == char_read){
                 //UPARROW
-                //AshellPrint("UP");
 
 				//Delete old command
-                for(int n = 0; n < i; n++){ 
+                for(int n = 0; n < num_chars; n++){ 
                     AshellPrint("\b \b");
                 }
 
@@ -530,10 +528,9 @@ void ReadAndParseCmd() {
             }
             else if(0x42 == char_read){
                 //DOWNARROW
-                //AshellPrint("DOWNARROW");
 
 				//Delete old command
-                for(int n = 0; n < i; n++){ 
+                for(int n = 0; n < num_chars; n++){ 
                     AshellPrint("\b \b"); 
                 }
 
@@ -558,60 +555,41 @@ void ReadAndParseCmd() {
 
         }
         else if (arrow_flag && 0x5B == char_read){
-
+			//Possibly an arrow key, set flag true and check next char above
             arrow_flag = true;
-
         }
-		//BACKSPACE CASE
+
+		//BACKSPACE CASE *---
         else if (0x7F == char_read){
-            //std::cout <<"back" << "\n";
-            //std::cout <<"got to if" << "\n";
-            AshellPrint("\b \b"); //this backspaces
-			i--;
-            prog[i] = char_read;
-			
-            //std::cout <<"this comes out: " << prog << "\n";
-
+            AshellPrint("\b \b"); 	//outputs backspace
+			num_chars--; 					//corrects number of chars entered
+            prog[num_chars] = char_read;	//replaces location in memory to backspace (maybe should be '\0'?)
         }
-        //STANDARD CASE
 
+        //STANDARD CASE (if the char can be printed) *---
         else if (isprint(char_read)){
-            //these lines don't fix it
-            prog[i] = char_read;
-            //char dec_to_char = prog[i];
-            //std::cout << "prog[i]: " << prog[i] <<"\n"; //getting the decimal representation
-            std::string str1 = charString(prog[i]);
-
-            AshellPrint(str1);
-
+            prog[num_chars] = char_read;					//sets location in memory to the printable char
+            std::string str1 = charString(prog[num_chars]); //converts prog[i] to string so it can work with AshellPrint
+            AshellPrint(str1);								//prints char to shell
         }
-        //ENTER CHASE
+        //ENTER CASE *---
         else if (0x0A == char_read) {
-            //std::cout <<"got to end line - so we think 1" << "\n";
+			//exit the loop
             end_line = true;
-            //always a null character at the end of the string
-            //prog[i] = '\0';
-
         }
+		//ARROW CASE	*---
         else{
-            //std::cout <<"char(" << char_read<<")";
-            //ARROW CASE
-            //AshellPrint("ARROW");
+			//Possibly an arrow key, set flag true and check next char above
             arrow_flag = true;
-            //end_line = true;
-            //always a null character at the end of the string
-            //prog[i] = '\0';
-
         }
-        //std::cout <<"out of if" << "\n";
-        i++;
+
+        num_chars++; //while enter not pressed, read the next char
 
 
     }
     num_lines++;
-	num_lines_tot++;
-    ResetCanonicalMode(STDIN_FILENO, &SavedTermAttributes);
-    //std::cout <<"prog:  " << prog << "    args:   " << args<< "\n\n";
-    parse(prog,&args);
-    //std::cout <<"Done."<< "\n";
+	num_lines_tot++;	//keep track of total number of lines
+    ResetCanonicalMode(STDIN_FILENO, &SavedTermAttributes); //reset canon mode
+    parse(prog,&args); //Parse the program
+
 }
