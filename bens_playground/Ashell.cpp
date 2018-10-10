@@ -534,7 +534,7 @@ void ReadAndParseCmd() {
 				//Audible bell up
 				AshellPrint(audible_bell);
 			}
-            else if(0x42 == char_read && num_lines != num_lines_tot-1){
+            else if(0x42 == char_read && num_lines != num_lines_tot){
                 //DOWNARROW
 
 				//Delete old command
@@ -548,7 +548,7 @@ void ReadAndParseCmd() {
 
                 arrow_flag = false;		//out of arrow
             }
-			else if(0x42 == char_read && num_lines == num_lines_tot-1){
+			else if(0x42 == char_read && num_lines == num_lines_tot){
 				//Audible bell down
 				AshellPrint(audible_bell);
 			}
@@ -570,10 +570,17 @@ void ReadAndParseCmd() {
         }
 
 		//BACKSPACE CASE *---
-        else if (0x7F == char_read){
+        else if (0x7F == char_read && num_chars > 0){
             AshellPrint("\b \b"); 	//outputs backspace
-			num_chars--; 					//corrects number of chars entered
+			num_chars= num_chars - 2;
+			//std::cout <<"Passing in:  " <<"\n";
+
+			//std::cout<<num_chars; 					//corrects number of chars entered
             prog[num_chars] = char_read;	//replaces location in memory to backspace (maybe should be '\0'?)
+        }
+		else if (0x7F == char_read && num_chars <= 0){
+ 			AshellPrint(audible_bell);
+			num_chars--;
         }
 
         //STANDARD CASE (if the char can be printed) *---
