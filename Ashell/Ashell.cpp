@@ -518,46 +518,166 @@ int size_of(char *array){
     return i;
 }
 int exec(char ** seperated){
-        std::cout <<"In exec  "  <<"\n";
-        pid_t pid;
-        pid_t parent_pid;
-        pid_t child_pid;
-        pid_t wait;
-        int status;
-        std::cout <<"process ID pre fork:  "  << pid <<"\n";
+                std::cout <<"In exec  "  <<"\n";
+                pid_t pid;
+                pid_t parent_pid;
+                pid_t child_pid;
+                pid_t wait;
+                int status;
+                int num_children = 0;
+                int num_numparents = 0;
+                int fd_old;
+                int fd[2];
+                int WRITE_END = 1;
+                int READ_END = 0;
+                bool used_output = false;
+                bool used_input = false;
 
-        pid = fork(); //two process running
 
-        //std::cout <<"process ID  "  << pid <<"\n";
+                //num of seperated commands
+                int num_seperated = 3;
+                //number of redirects
+                //number of pipes
 
-        //child
-        //http://man7.org/linux/man-pages/man2/getpid.2.html
-        if(pid == -1){
-                std::cout <<"fork error "  << pid <<"\n";
-                //exit();
-        }
-        else if (pid == 0){
-                //child process: exec
-                std::cout <<"child process: " <<"\n";
-                std::cout <<"child: "  << getpid() << " parent: "<< getppid()<<"\n";
-                std::cout <<"exec: "  << execvp(seperated[0], seperated)<<"\n"; //if returns, error
 
-                //getpid() returns PID of calling process
-                //getppid() returns PID of the parent of the calling process (ID of parent, or ID of reparented)
-        }
-        else{
-                //parent process: child executed, parent wait for child to finish
-                std::cout <<"parent process: " <<"\n";
-                std::cout <<"parent: "  << getpid() << " child: "<< pid<<"\n";
-                waitpid(pid, &status, WEXITED);
-                std::cout <<"child returned, status: "  << status << "\n";
 
-        }
+                for(int i = 0; i < num_seperated; i++){
+                        int input;
+                        int output;
 
-        //error
+                        //std::cout <<"process ID pre fork:  "  << pid <<"\n";
+                        //https://www.geeksforgeeks.org/c-program-demonstrate-fork-and-pipe/
+                        pipe(fd);
+                        pid = fork(); //two process running
+                        num_children++;
+                        fd_old = 0;
+                        //std::cout <<"process ID  "  << pid <<"\n";
 
-        //parent
-                //wait for it to finish
+                        //child
+                        //http://man7.org/linux/man-pages/man2/getpid.2.html
+                        if(pid == -1){
+                                        std::cout <<"fork error "  << pid <<"\n";
+                                        //exit();
+                        }
+                        else if (pid == 0){
+                                        //child process: exec
+                                        //std::cout <<"child process: " <<"\n";
+                                        //std::cout <<"child: "  << getpid() << " parent: "<< getppid()<<"\n";
+                                        //std::cout <<"exec: "  << execvp(seperated[0], seperated)<<"\n"; //if returns, error
+
+
+                                        //getpid() returns PID of calling process
+                                        //getppid() returns PID of the parent of the calling process (ID of parent, or ID of reparented)
+
+                                        //https://www.geeksforgeeks.org/dup-dup2-linux-system-call/
+
+                                        //redirect right: https://unix.stackexchange.com/questions/122977/what-is-the-correct-name-for-the-command
+                                        dup2(fd_old, 0); //old fd and new fd, new fd dup2 creates a copy, old fd in
+
+                                        //chaining commands with chase's fn
+                                        if(i + 1 < num_seperated && seperated[i + 1] == ">"){
+                                                std::cout <<"recognize > "<<"\n";
+                                                std::cout <<"sep[i + 2]: " <<seperated[i + 2] <<"\n";
+                                                const char* newfile = seperated[i + 2];
+                                                std::cout <<"new file: " << newfile <<"\n";
+
+                                                //return dup2(newfd, oldfd);
+                                                output = redir(0, newfile); //old fd, newfile
+                                                used_output = true;
+                                        }
+                                        if(i + 1 < num_seperated && seperated[i + 1] == "<"){
+
+                                                std::cout <<"sep[i + 2]: " <<seperated[i + 2] <<"\n";
+                                                const char* newfile = seperated[i + 2];
+                                                std::cout <<"new file: " << newfile <<"\n";
+
+                                                //return dup2(newfd, oldfd);
+                                                input = redir(0, newfile); //old fd, newfile
+                                                //check if input == -1
+                                                used_input = true;
+                                        }
+                                        if(i + 3 < num_seperated && seperated[i + 3] == ">"){
+
+                                                std::cout <<"sep[i + 2]: " <<seperated[i + 4] <<"\n";
+                                                const char* newfile = seperated[i + 4];
+                                                std::cout <<"new file: " << newfile <<"\n";
+
+                                                //return dup2(newfd, oldfd);
+                                                output = redir(0, newfile); //old fd, newfile
+                                                //check if input == -1
+                                                used_output = true;
+                                        }
+
+
+                                if(num_children != num_seperated){
+                                        //if its not a leaf child: output the childs output to STDOUT
+
+                                        //std::cout <<"NOT LEAF CHILD: " <<"\n";
+                                        //const char* newfile = fd[WRITE_END];			//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
+
+                                        //std::cout <<"new file: " << newfile <<"\n";
+
+                                        //return dup2(newfd, oldfd);
+                                        //output = redir(STDOUT_FILENO, newfile) //old fd, newfile https://stackoverflow.com/questions/12902627/the-difference-between-stdout-and-stdout-fileno-in-linux-c
+
+                                        //Helpful: https://stackoverflow.com/questions/25722730/cannot-dup2-write-end-of-a-pipe-to-stdout
+                                        dup2(fd[WRITE_END], STDOUT_FILENO);
+                                        if(used_input){
+                                                //input = redir(STDIN_FILENO, input) //not sure if we need to redirect, may just need to dup
+                                                dup2(input, STDIN_FILENO);
+                                                close(input);
+                                        }
+                                        if(used_output){
+                                                //output = redir(STDOUT_FILENO, output)
+                                                dup2(output, STDOUT_FILENO);
+                                                close(output);
+                                        }
+
+                                }
+                                else{
+                                        //if its the last child: replace STDOUT with file
+                                        if(used_input){
+                                                //input = redir(STDIN_FILENO, input) //not sure if we need to redirect, may just need to dup
+                                                dup2(input, STDIN_FILENO);
+                                                close(input);
+                                        }
+                                        if(used_output){
+                                                //output = redir(STDOUT_FILENO, output)
+                                                dup2(output, STDOUT_FILENO);
+                                                close(output);
+                                        }
+
+                                }
+                                close(fd[READ_END]);		//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
+
+                                //if it is not one of the commands:
+                                //std::cout <<"execvp("  << seperated[0] << " " << seperated << ")"<<"\n"; //if returns, error
+                                execvp(seperated[0], seperated);
+                                exit(EXIT_FAILURE);		//https://stackoverflow.com/questions/13667364/exit-failure-vs-exit1
+
+                                //parent
+                                                //wait for it to finish
+                        }
+                        else{
+                                        //parent process: child executed, parent wait for child to finish
+                                        //std::cout <<"WAIT " <<"\n";
+                                        //std::cout <<"parent process: " <<"\n";
+                                        //std::cout <<"parent: "  << getpid() << " child: "<< pid<<"\n";
+                                        waitpid(pid, &status, WEXITED); //https://linux.die.net/man/2/waitpid PID
+                                        //std::cout <<"child returned, status: "  << status << " WEXITED: " << WEXITED << "\n";
+
+                                        //close fd[WRITE_END];
+                                        fd_old = fd[READ_END];
+
+
+
+                        }
+
+                }
+                //OUTSIDE OF FOR
+
+
+
 
 
 }
