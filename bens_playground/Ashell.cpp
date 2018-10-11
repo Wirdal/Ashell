@@ -545,7 +545,7 @@ int exec(char ** seperated){
 			int input;
 			int output;
 
-			std::cout <<"process ID pre fork:  "  << pid <<"\n";
+			//std::cout <<"process ID pre fork:  "  << pid <<"\n";
 			//https://www.geeksforgeeks.org/c-program-demonstrate-fork-and-pipe/
 			pipe(fd);
 			pid = fork(); //two process running
@@ -561,9 +561,9 @@ int exec(char ** seperated){
 			}
 			else if (pid == 0){
 					//child process: exec
-					std::cout <<"child process: " <<"\n";
-					std::cout <<"child: "  << getpid() << " parent: "<< getppid()<<"\n";
-					std::cout <<"exec: "  << execvp(seperated[0], seperated)<<"\n"; //if returns, error
+					//std::cout <<"child process: " <<"\n";
+					//std::cout <<"child: "  << getpid() << " parent: "<< getppid()<<"\n";
+					//std::cout <<"exec: "  << execvp(seperated[0], seperated)<<"\n"; //if returns, error
 
 
 					//getpid() returns PID of calling process
@@ -576,7 +576,7 @@ int exec(char ** seperated){
 
 					//chaining commands with chase's fn
 					if(i + 1 < num_seperated && seperated[i + 1] == ">"){ 
-
+						std::cout <<"recognize > "<<"\n";
 						std::cout <<"sep[i + 2]: " <<seperated[i + 2] <<"\n";
 						const char* newfile = seperated[i + 2];
 						std::cout <<"new file: " << newfile <<"\n";
@@ -612,7 +612,7 @@ int exec(char ** seperated){
 				if(num_children != num_seperated){
 					//if its not a leaf child: output the childs output to STDOUT 
 
-					std::cout <<"NOT LEAF CHILD: " <<"\n";
+					//std::cout <<"NOT LEAF CHILD: " <<"\n";
 					//const char* newfile = fd[WRITE_END];			//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
 
 					//std::cout <<"new file: " << newfile <<"\n";
@@ -651,7 +651,7 @@ int exec(char ** seperated){
 				close(fd[READ_END]);		//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
 
 				//if it is not one of the commands:
-				std::cout <<"exec: "  << execvp(seperated[0], seperated)<<"\n"; //if returns, error
+				//std::cout <<"execvp("  << seperated[0] << " " << seperated << ")"<<"\n"; //if returns, error
 				execvp(seperated[0], seperated);
 				exit(EXIT_FAILURE);		//https://stackoverflow.com/questions/13667364/exit-failure-vs-exit1
 
@@ -660,11 +660,11 @@ int exec(char ** seperated){
 			}
 			else{
 					//parent process: child executed, parent wait for child to finish
-					std::cout <<"WAIT " <<"\n";
-					std::cout <<"parent process: " <<"\n";
-					std::cout <<"parent: "  << getpid() << " child: "<< pid<<"\n";
-					waitpid(pid, &status, WEXITED);
-					std::cout <<"child returned, status: "  << status << "\n";
+					//std::cout <<"WAIT " <<"\n";
+					//std::cout <<"parent process: " <<"\n";
+					//std::cout <<"parent: "  << getpid() << " child: "<< pid<<"\n";
+					waitpid(pid, &status, WEXITED); //https://linux.die.net/man/2/waitpid PID
+					//std::cout <<"child returned, status: "  << status << " WEXITED: " << WEXITED << "\n";
 
 					//close fd[WRITE_END];
 					fd_old = fd[READ_END];
@@ -683,6 +683,9 @@ int exec(char ** seperated){
 }
 void CallPrograms(char **seperated, int num_args){
     char * run_program = seperated[0]; //the first argument is the program to run
+
+	//see >, reset runprogram
+	//
 
     if(run_program[0] == 'c' && run_program[1] == 'd' && run_program[2] == '\0'){
         std::cout <<"Execute CD "<<"\n";
