@@ -40,6 +40,8 @@ void ls(std::string directory);
 void ls();
 
 std::vector<std::string> ff(const char* filename, const char* directory, const char* newdir);
+std::vector<std::string> ffemptdir(const char* filename,  const char* newdir);
+
 
 // Reading
 

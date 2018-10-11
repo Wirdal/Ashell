@@ -396,6 +396,62 @@ std::vector<std::string> ff(const char* filename, const char* directory, const c
 	return vec;
 };
 
+std::vector<std::string> ffemptdir(const char* filename, const char* newdir){
+	//Should be very similair, except we need to change to whatever the local dir is
+	std::vector<std::string> vec;
+  	DIR* dir;
+  	struct dirent *entry;
+  	struct stat statbuff;
+	// Start by opening the directory that we're at, or attempting to
+	if (NULL != newdir){
+		chdir(newdir);
+	}
+	//Open the directory
+	dir = opendir(get_current_dir_name());
+	//Start reading from it
+	entry = readdir(dir);
+	while (entry != NULL){ //So long as we have read something
+		stat(entry->d_name, &statbuff);
+		if (0==strcmp(filename, entry->d_name)){
+			//Add it to vector?
+			std::string slash = "/";
+			std::string fileloc;
+			if (newdir == NULL){
+				fileloc = "." + slash + filename;
+			}
+			else{
+				fileloc = "." + slash + newdir +slash + filename;
+			}
+			vec.push_back(fileloc);
+			entry = readdir(dir);
+		}
+		else if ((0 == strcmp(".", entry->d_name)) ||(0 == strcmp("..", entry->d_name))){
+			entry = readdir(dir); //Read the next entry
+		}
+		else if (S_ISDIR(statbuff.st_mode)){
+			const char* saveddir = get_current_dir_name();
+			if (chdir(entry->d_name)==-1){
+				//Can't open the file
+			}
+			else{
+				//Open it, and check what happens
+				std::vector <std::string> retvec = ffemptdir(filename, entry->d_name);
+				for(int i=0; i<retvec.size(); ++i){
+					vec.push_back(retvec[i]);
+				}
+			}
+			chdir(saveddir);
+			entry = readdir(dir);
+		}
+		else{
+			entry = readdir(dir);
+		}
+	}
+
+	// Should now be in the proper directory, or have returned by now
+	return vec;
+};
+
 //convert a string
 //https://www.geeksforgeeks.org/how-to-convert-a-single-character-to-string-in-cpp/
 std::string charString (char x){
