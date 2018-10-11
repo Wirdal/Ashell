@@ -93,6 +93,31 @@ void minipwd(){
   else{
     pwd();
   }
+/*
+	To Benjamin
+	Here is how this function works
+	You supply it the file descriptor of something
+		If you dont have a FD, you're probably parsing a command first
+		Use 1 as oldfd then
+	then give it a filename.
+	Then execute the command, and you should see the input accordingly
+
+	If you're storing tokens in a vector, remember what I said in the CSIF
+	You can iterate through that list till the index is to the second to last
+	And call my fn on index, and index+1
+	It should chain them all appropriatly.
+
+	If you get any weirdness with executing things after that, it might this thing. I am unsure if it closes after use
+
+	Sincerly
+	Chase Maguire
+	XOXOX
+*/
+int redir(int oldfd, const char* newfile){
+
+	int newfd = open(newfile, O_CREAT|O_WRONLY|O_TRUNC);
+	return dup2(newfd, oldfd);
+}
 
 
 void exit(){
