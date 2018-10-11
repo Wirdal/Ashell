@@ -4,6 +4,8 @@
 #include <iostream>
 
 int main (int argc, char *argv[]) {
+
+  /*
   const char *file = "ff";
   const char *dir = "fftest";
 
@@ -17,6 +19,15 @@ int main (int argc, char *argv[]) {
     AshellPrint(vec[i]);
     AshellPrint("\n");
    }
+   */
+  minipwd();
+  while(1){
+    ReadAndParseCmd();
+    minipwd();
+  }
+  //free everything, reset everything
+
+
   //Main loops goes here
   //While true
     //Wait for input
