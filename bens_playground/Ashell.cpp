@@ -10,7 +10,8 @@
 #include <termios.h>
 #include <ctype.h>
 #include <vector>
-#include <typeinfo>
+#include <sys/wait.h> //for waitpid(3)
+
 //from noncanmode.c
 void ResetCanonicalMode(int fd, struct termios *savedattributes){
     tcsetattr(fd, TCSANOW, savedattributes);
@@ -70,13 +71,31 @@ int AshellOpen(const char *path, int flags, .../*, mode_t mode*/){
 };
 // Shell commands
 
-
+/*
 void pwd(){
 	char *path = get_current_dir_name();
 	AshellPrint(path);
 	free(path);
 	AshellPrint("\n");
 };
+void minipwd(){
+  // Acts as the first thing pritned out, before parsing happens
+  std::string path = get_current_dir_name();
+  if (path.length() > 16){
+    //Do the truncating
+    //Find the first slash, going backwards
+    std::string truncpath;
+    std::size_t slashpos = path.rfind("/");
+
+    truncpath = "/..." + path.substr(slashpos);
+    AshellPrint(truncpath);
+    AshellPrint("% ");
+  }
+  else{
+    pwd();
+  }
+*/
+
 
 void exit(){
 	exit(EXIT_SUCCESS);
@@ -96,6 +115,12 @@ void cd(std::string directory){
 
 	}
 };
+/*
+int readir(std::string oldfile, newfile){
+  open(newfile, O_CREAT);
+
+}
+*/
 // BIG help in ls
 // https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
 void ls(const char* directory){
@@ -254,7 +279,7 @@ void ls(std::string directory){
   	}
   }
 };
-
+/*
 void ls(){
   DIR* dir;
   struct dirent *entry;
@@ -395,6 +420,62 @@ std::vector<std::string> ff(const char* filename, const char* directory, const c
 	return vec;
 };
 
+std::vector<std::string> ffemptdir(const char* filename, const char* newdir){
+	//Should be very similair, except we need to change to whatever the local dir is
+	std::vector<std::string> vec;
+  	DIR* dir;
+  	struct dirent *entry;
+  	struct stat statbuff;
+	// Start by opening the directory that we're at, or attempting to
+	if (NULL != newdir){
+		chdir(newdir);
+	}
+	//Open the directory
+	dir = opendir(get_current_dir_name());
+	//Start reading from it
+	entry = readdir(dir);
+	while (entry != NULL){ //So long as we have read something
+		stat(entry->d_name, &statbuff);
+		if (0==strcmp(filename, entry->d_name)){
+			//Add it to vector?
+			std::string slash = "/";
+			std::string fileloc;
+			if (newdir == NULL){
+				fileloc = "." + slash + filename;
+			}
+			else{
+				fileloc = "." + slash + newdir +slash + filename;
+			}
+			vec.push_back(fileloc);
+			entry = readdir(dir);
+		}
+		else if ((0 == strcmp(".", entry->d_name)) ||(0 == strcmp("..", entry->d_name))){
+			entry = readdir(dir); //Read the next entry
+		}
+		else if (S_ISDIR(statbuff.st_mode)){
+			const char* saveddir = get_current_dir_name();
+			if (chdir(entry->d_name)==-1){
+				//Can't open the file
+			}
+			else{
+				//Open it, and check what happens
+				std::vector <std::string> retvec = ffemptdir(filename, entry->d_name);
+				for(int i=0; i<retvec.size(); ++i){
+					vec.push_back(retvec[i]);
+				}
+			}
+			chdir(saveddir);
+			entry = readdir(dir);
+		}
+		else{
+			entry = readdir(dir);
+		}
+	}
+
+	// Should now be in the proper directory, or have returned by now
+	return vec;
+};
+*/
 //convert a string
 //https://www.geeksforgeeks.org/how-to-convert-a-single-character-to-string-in-cpp/
 std::string charString (char x){
@@ -409,48 +490,194 @@ int size_of(char *array){
     }
     return i;
 }
+
+/*
+	To Benjamin
+	Here is how this function works
+	You supply it the file descriptor of something
+		If you dont have a FD, you're probably parsing a command first
+		Use 1 as oldfd then
+	then give it a filename.
+	Then execute the command, and you should see the input accordingly
+
+	If you're storing tokens in a vector, remember what I said in the CSIF
+	You can iterate through that list till the index is to the second to last
+	And call my fn on index, and index+1
+	It should chain them all appropriatly.
+
+	If you get any weirdness with executing things after that, it might this thing. I am unsure if it closes after use
+
+	Sincerly
+	Chase Maguire
+	XOXOX
+*/
+int redir(int oldfd, const char* newfile){
+
+	int newfd = open(newfile, O_CREAT|O_WRONLY|O_TRUNC);
+	return dup2(newfd, oldfd);
+}
+
 int exec(char ** seperated){
-	std::cout <<"In exec  "  <<"\n";
-	pid_t pid;
-	pid_t parent_pid;
-	pid_t child_pid;
-	pid_t wait;
-	int status;
-	std::cout <<"process ID pre fork:  "  << pid <<"\n";
-
-	pid = fork(); //two process running
-
-	//std::cout <<"process ID  "  << pid <<"\n";
-
-	//child
-	//http://man7.org/linux/man-pages/man2/getpid.2.html
-	if(pid == -1){
-		std::cout <<"fork error "  << pid <<"\n";
-		//exit();
-	}
-	else if (pid == 0){
-		//child process: exec
-		std::cout <<"child process: " <<"\n";
-		std::cout <<"child: "  << getpid() << " parent: "<< getppid()<<"\n";
-		std::cout <<"exec: "  << execvp(seperated[0], seperated)<<"\n"; //if returns, error
+        std::cout <<"In exec  "  <<"\n";
+        pid_t pid;
+        pid_t parent_pid;
+        pid_t child_pid;
+        pid_t wait;
+        int status;
+		int num_children = 0;
+		int num_numparents = 0;
+		int fd_old;
+		int fd[2];
+		int WRITE_END = 1;
+		int READ_END = 0;
+		bool used_output = false;
+		bool used_input = false;
 		
-		//getpid() returns PID of calling process
-		//getppid() returns PID of the parent of the calling process (ID of parent, or ID of reparented)
-	}
-	else{
-		//parent process: child executed, parent wait for child to finish
-		std::cout <<"parent process: " <<"\n";
-		std::cout <<"parent: "  << getpid() << " child: "<< pid<<"\n";
-		waitpid(pid, &status, WEXITED);
-		printf("The child exited with return code %d\n", status);
-		std::cout <<"child returned, status: "  << status << "\n";
 
-	}
+		//num of seperated commands
+		int num_seperated = 3;
+		//number of redirects
+		//number of pipes
 
-	//error
 
-	//parent
-		//wait for it to finish
+
+		for(int i = 0; i < num_seperated; i++){
+			int input;
+			int output;
+
+			std::cout <<"process ID pre fork:  "  << pid <<"\n";
+			//https://www.geeksforgeeks.org/c-program-demonstrate-fork-and-pipe/
+			pipe(fd);
+			pid = fork(); //two process running
+			num_children++;
+			fd_old = 0;
+			//std::cout <<"process ID  "  << pid <<"\n";
+
+			//child
+			//http://man7.org/linux/man-pages/man2/getpid.2.html
+			if(pid == -1){
+					std::cout <<"fork error "  << pid <<"\n";
+					//exit();
+			}
+			else if (pid == 0){
+					//child process: exec
+					std::cout <<"child process: " <<"\n";
+					std::cout <<"child: "  << getpid() << " parent: "<< getppid()<<"\n";
+					std::cout <<"exec: "  << execvp(seperated[0], seperated)<<"\n"; //if returns, error
+
+
+					//getpid() returns PID of calling process
+					//getppid() returns PID of the parent of the calling process (ID of parent, or ID of reparented)
+
+					//https://www.geeksforgeeks.org/dup-dup2-linux-system-call/
+
+					//redirect right: https://unix.stackexchange.com/questions/122977/what-is-the-correct-name-for-the-command
+					dup2(fd_old, 0); //old fd and new fd, new fd dup2 creates a copy, old fd in
+
+					//chaining commands with chase's fn
+					if(i + 1 < num_seperated && seperated[i + 1] == ">"){ 
+
+						std::cout <<"sep[i + 2]: " <<seperated[i + 2] <<"\n";
+						const char* newfile = seperated[i + 2];
+						std::cout <<"new file: " << newfile <<"\n";
+
+						//return dup2(newfd, oldfd);
+						output = redir(0, newfile); //old fd, newfile 
+						used_output = true;
+					}
+					if(i + 1 < num_seperated && seperated[i + 1] == "<"){ 
+
+						std::cout <<"sep[i + 2]: " <<seperated[i + 2] <<"\n";
+						const char* newfile = seperated[i + 2];
+						std::cout <<"new file: " << newfile <<"\n";
+
+						//return dup2(newfd, oldfd);
+						input = redir(0, newfile); //old fd, newfile
+						//check if input == -1 
+						used_input = true;
+					}
+					if(i + 3 < num_seperated && seperated[i + 3] == ">"){ 
+
+						std::cout <<"sep[i + 2]: " <<seperated[i + 4] <<"\n";
+						const char* newfile = seperated[i + 4];
+						std::cout <<"new file: " << newfile <<"\n";
+
+						//return dup2(newfd, oldfd);
+						output = redir(0, newfile); //old fd, newfile
+						//check if input == -1 
+						used_output = true;
+					}
+			
+			
+				if(num_children != num_seperated){
+					//if its not a leaf child: output the childs output to STDOUT 
+
+					std::cout <<"NOT LEAF CHILD: " <<"\n";
+					//const char* newfile = fd[WRITE_END];			//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
+
+					//std::cout <<"new file: " << newfile <<"\n";
+
+					//return dup2(newfd, oldfd);
+					//output = redir(STDOUT_FILENO, newfile) //old fd, newfile https://stackoverflow.com/questions/12902627/the-difference-between-stdout-and-stdout-fileno-in-linux-c
+
+					//Helpful: https://stackoverflow.com/questions/25722730/cannot-dup2-write-end-of-a-pipe-to-stdout
+					dup2(fd[WRITE_END], STDOUT_FILENO);
+					if(used_input){
+						//input = redir(STDIN_FILENO, input) //not sure if we need to redirect, may just need to dup
+						dup2(input, STDIN_FILENO);
+						close(input);
+					}
+					if(used_output){
+						//output = redir(STDOUT_FILENO, output)
+						dup2(output, STDOUT_FILENO);
+						close(output);
+					}
+
+				}
+				else{
+					//if its the last child: replace STDOUT with file
+					if(used_input){
+						//input = redir(STDIN_FILENO, input) //not sure if we need to redirect, may just need to dup
+						dup2(input, STDIN_FILENO);
+						close(input);
+					}
+					if(used_output){
+						//output = redir(STDOUT_FILENO, output)
+						dup2(output, STDOUT_FILENO);
+						close(output);
+					}
+
+				}
+				close(fd[READ_END]);		//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
+
+				//if it is not one of the commands:
+				std::cout <<"exec: "  << execvp(seperated[0], seperated)<<"\n"; //if returns, error
+				execvp(seperated[0], seperated);
+				exit(EXIT_FAILURE);		//https://stackoverflow.com/questions/13667364/exit-failure-vs-exit1
+
+				//parent
+						//wait for it to finish
+			}
+			else{
+					//parent process: child executed, parent wait for child to finish
+					std::cout <<"WAIT " <<"\n";
+					std::cout <<"parent process: " <<"\n";
+					std::cout <<"parent: "  << getpid() << " child: "<< pid<<"\n";
+					waitpid(pid, &status, WEXITED);
+					std::cout <<"child returned, status: "  << status << "\n";
+
+					//close fd[WRITE_END];
+					fd_old = fd[READ_END];
+
+					
+
+			}
+
+		}
+		//OUTSIDE OF FOR
+
+
+
 
 
 }
@@ -531,30 +758,30 @@ void parse(char *prog, char **parsed){
 }
 
 void ReadAndParseCmd() {
-	std::string audible_bell = charString('\a'); //audible bell
+        std::string audible_bell = charString('\a'); //audible bell
 
     bool end_line = false;
     int max_size = 512;  	//TODO: switch to buffer or malloc system if necessary
     int num_chars = 0;		//the num of chars in a line
     int num_lines;
-	int num_lines_tot;
+        int num_lines_tot;
 
     char test_array[100] = "12345678";
 
     size_t bytes_read = 0;
 
-    
-	//Setting up memory
+
+        //Setting up memory
     char prog_mem[100] = ""; //TODO: find max size
     char args_mem[100] = ""; //TODO: is this read-only memory
-	
+
 
     char * prog = prog_mem; //Array containing chars until enter hit
     char *args = args_mem; 	//Input after the command/program
-	//char * parsed; 			//to contain parsed input
+        //char * parsed; 			//to contain parsed input
 
     char hist[10][10];
-	char char_read = '\0';
+        char char_read = '\0';
 
 
     bool arrow_flag;
@@ -577,11 +804,11 @@ void ReadAndParseCmd() {
 
 
         //EOT (end of transit) CASE *---
-        if(0x04 == char_read){ // C-d 
+        if(0x04 == char_read){ // C-d
             std::cout <<"its something else entirely..." << "\n";
             break;
         }
-        
+
         //ARROW CASE *---
         else if (arrow_flag && 0x5B != char_read){
 
@@ -592,39 +819,39 @@ void ReadAndParseCmd() {
 
 
 
-				//Delete old command
-                for(int n = 0; n < num_chars; n++){ 
+                                //Delete old command
+                for(int n = 0; n < num_chars; n++){
                     AshellPrint("\b \b");
                 }
 
-				num_lines--;			//set line number
-				prog = hist[num_lines];	//set program to history
+                                num_lines--;			//set line number
+                                prog = hist[num_lines];	//set program to history
                 AshellPrint(prog);		//print program
 
                 arrow_flag = false;		//out of arrow
             }
-			else if(0x41 == char_read && num_lines == 0){
-				//Audible bell up
-				AshellPrint(audible_bell);
-			}
+                        else if(0x41 == char_read && num_lines == 0){
+                                //Audible bell up
+                                AshellPrint(audible_bell);
+                        }
             else if(0x42 == char_read && num_lines != num_lines_tot){
                 //DOWNARROW
 
-				//Delete old command
-                for(int n = 0; n < num_chars; n++){ 
-                    AshellPrint("\b \b"); 
+                                //Delete old command
+                for(int n = 0; n < num_chars; n++){
+                    AshellPrint("\b \b");
                 }
 
-				num_lines++;			//set line number
-				prog = hist[num_lines];	//set program to history
+                                num_lines++;			//set line number
+                                prog = hist[num_lines];	//set program to history
                 AshellPrint(prog);		//print program
 
                 arrow_flag = false;		//out of arrow
             }
-			else if(0x42 == char_read && num_lines == num_lines_tot){
-				//Audible bell down
-				AshellPrint(audible_bell);
-			}
+                        else if(0x42 == char_read && num_lines == num_lines_tot){
+                                //Audible bell down
+                                AshellPrint(audible_bell);
+                        }
             else if(0x43 == char_read){
                 //RIGHTARROW
                 arrow_flag = false;
@@ -638,22 +865,22 @@ void ReadAndParseCmd() {
 
         }
         else if (arrow_flag && 0x5B == char_read){
-			//Possibly an arrow key, set flag true and check next char above
+                        //Possibly an arrow key, set flag true and check next char above
             arrow_flag = true;
         }
 
-		//BACKSPACE CASE *---
+                //BACKSPACE CASE *---
         else if (0x7F == char_read && num_chars > 0){
             AshellPrint("\b \b"); 	//outputs backspace
-			num_chars= num_chars - 2;
-			//std::cout <<"Passing in:  " <<"\n";
+                        num_chars= num_chars - 2;
+                        //std::cout <<"Passing in:  " <<"\n";
 
-			//std::cout<<num_chars; 					//corrects number of chars entered
+                        //std::cout<<num_chars; 					//corrects number of chars entered
             prog[num_chars] = char_read;	//replaces location in memory to backspace (maybe should be '\0'?)
         }
-		else if (0x7F == char_read && num_chars <= 0){
- 			AshellPrint(audible_bell);
-			num_chars--;
+                else if (0x7F == char_read && num_chars <= 0){
+                        AshellPrint(audible_bell);
+                        num_chars--;
         }
 
         //STANDARD CASE (if the char can be printed) *---
@@ -664,12 +891,12 @@ void ReadAndParseCmd() {
         }
         //ENTER CASE *---
         else if (0x0A == char_read) {
-			//exit the loop
+                        //exit the loop
             end_line = true;
         }
-		//ARROW CASE	*---
+                //ARROW CASE	*---
         else{
-			//Possibly an arrow key, set flag true and check next char above
+                        //Possibly an arrow key, set flag true and check next char above
             arrow_flag = true;
         }
 
@@ -678,7 +905,7 @@ void ReadAndParseCmd() {
 
     }
     num_lines++;
-	num_lines_tot++;	//keep track of total number of lines
+        num_lines_tot++;	//keep track of total number of lines
     ResetCanonicalMode(STDIN_FILENO, &SavedTermAttributes); //reset canon mode
     parse(prog,&args); //Parse the program
 
