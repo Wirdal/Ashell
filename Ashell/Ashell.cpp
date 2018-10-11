@@ -60,7 +60,6 @@ void AshellPrint(int output){
 	AshellPrint(out2.c_str());
 };
 
-
 size_t AshellRead(int fd, void *buf, size_t count){
 //TODO
 };
@@ -517,8 +516,10 @@ int size_of(char *array){
     }
     return i;
 }
-int exec(char ** seperated){
+int exec(char ** seperated, int * metadata){
                 std::cout <<"In exec  "  <<"\n";
+                std::cout <<"Meta:  "  << metadata[0]<< metadata[1]<< metadata[2]<<"\n";
+                //std::cout <<"Meta:  "  << metadata<<"\n";
                 pid_t pid;
                 pid_t parent_pid;
                 pid_t child_pid;
@@ -533,11 +534,10 @@ int exec(char ** seperated){
                 bool used_output = false;
                 bool used_input = false;
 
-
-                //num of seperated commands
-                int num_seperated = 3;
-                //number of redirects
-                //number of pipes
+                int num_args = metadata[0];
+                int num_seperated = metadata[1];
+                int num_pipes = metadata[2];
+\
 
 
 
@@ -681,8 +681,11 @@ int exec(char ** seperated){
 
 
 }
-void CallPrograms(char **seperated, int num_args){
+void CallPrograms(char **seperated, int * metadata){
     char * run_program = seperated[0]; //the first argument is the program to run
+
+    //wrong - metadata[0] = num_args+1;
+    int num_args = metadata[0] - 1; //this is actually num of splits
 
     if(run_program[0] == 'c' && run_program[1] == 'd' && run_program[2] == '\0'){
         std::cout <<"Execute CD "<<"\n";
@@ -768,7 +771,7 @@ void CallPrograms(char **seperated, int num_args){
     }
     else{
         std::cout <<"\n"<<"Run Exec(" << run_program<<");" <<"\n";
-        exec(seperated);
+        exec(seperated, metadata);
     }
 
 
@@ -776,7 +779,7 @@ void CallPrograms(char **seperated, int num_args){
 
 void parse(char *prog, char **parsed){
 
-
+    int metadata[] = {0,0,0};
 
 
     //Parsing char array received, basically a split line function.
@@ -786,25 +789,28 @@ void parse(char *prog, char **parsed){
     char split_memory[110];
     char * split = split_memory;
     char * seperated[15] = {0}; //initialize to zero or seg fault in ls call
-
+    //https://stackoverflow.com/questions/26597977/split-string-with-multiple-delimiters-using-strtok-in-c
+    char delimit[]=" \<\>\|";
     //http://www.cplusplus.com/reference/cstring/strtok/
-    split = strtok(prog, " ");
+    split = strtok(prog, delimit);
 
     while (split != NULL){
         seperated[i] = split;
         //std::cout <<"seperated[" << i << "] "<< seperated[i] << "\n";
         parsed[i] = split;
         //Not sure what split becomes
-        split = strtok(NULL, " ");
+        split = strtok(NULL, delimit);
         ++i;
+        //NUMBER OF ARGS IS i
+
     }
     seperated[i] = split;
 
     char * run_program = seperated[0];
-    int num_args = i -1;
+    metadata[0] = i -1;
+    //std::cout <<"\n"<<"num_splits: " << i <<"\n";
 
-
-    CallPrograms(seperated, num_args);
+    CallPrograms(seperated, metadata);
 }
 
 void ReadAndParseCmd() {
@@ -817,7 +823,7 @@ void ReadAndParseCmd() {
     int max_size = 512;  	//TODO: switch to buffer or malloc system if necessary
     int num_chars = 0;		//the num of chars in a line
     int num_lines;
-        int num_lines_tot;
+    int num_lines_tot;
 
     char test_array[100] = "12345678";
 
@@ -946,6 +952,9 @@ void ReadAndParseCmd() {
         //ENTER CASE *---
         else if (0x0A == char_read) {
                         //exit the loop
+            for(int j = 0; j < num_chars + 1; ++j){
+                //std::cout <<prog[j - 1] <<"\n";
+            }
             end_line = true;
         }
                 //ARROW CASE	*---
@@ -959,7 +968,7 @@ void ReadAndParseCmd() {
 
     }
     num_lines++;
-        num_lines_tot++;	//keep track of total number of lines
+    num_lines_tot++;	//keep track of total number of lines
     ResetCanonicalMode(STDIN_FILENO, &SavedTermAttributes); //reset canon mode
     parse(prog,&args); //Parse the program
 
