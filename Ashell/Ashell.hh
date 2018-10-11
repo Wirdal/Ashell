@@ -30,6 +30,7 @@ int exec(char ** seperated);
 
 
 void pwd();
+void minipwd();
 
 void exit();
 

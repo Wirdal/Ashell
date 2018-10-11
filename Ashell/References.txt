@@ -17,6 +17,10 @@ References in ls
 https://www.geeksforgeeks.org/structures-c/
 https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
 
+References in '>' and '<'
+http://man7.org/linux/man-pages/man2/dup.2.html
+http://man7.org/linux/man-pages/man2/open.2.html
+
 For CPP tutorials
 https://www.tutorialspoint.com/cplusplus/cpp_overloading.htm
 https://www.geeksforgeeks.org/char-vs-stdstring-vs-char-c/

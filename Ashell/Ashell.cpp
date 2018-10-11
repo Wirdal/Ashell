@@ -10,7 +10,6 @@
 #include <termios.h>
 #include <ctype.h>
 #include <vector>
-#include <typeinfo>
 #include <sys/wait.h> //for waitpid(3)
 //from noncanmode.c
 void ResetCanonicalMode(int fd, struct termios *savedattributes){
@@ -78,6 +77,23 @@ void pwd(){
 	free(path);
 	AshellPrint("\n");
 };
+void minipwd(){
+  // Acts as the first thing pritned out, before parsing happens
+  std::string path = get_current_dir_name();
+  if (path.length() > 16){
+    //Do the truncating
+    //Find the first slash, going backwards
+    std::string truncpath;
+    std::size_t slashpos = path.rfind("/");
+
+    truncpath = "/..." + path.substr(slashpos);
+    AshellPrint(truncpath);
+    AshellPrint("% ");
+  }
+  else{
+    pwd();
+  }
+
 
 void exit(){
 	exit(EXIT_SUCCESS);
@@ -97,6 +113,12 @@ void cd(std::string directory){
 
 	}
 };
+
+int readir(std::string oldfile, newfile){
+  open(newfile, O_CREAT);
+
+}
+
 // BIG help in ls
 // https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
 void ls(const char* directory){
