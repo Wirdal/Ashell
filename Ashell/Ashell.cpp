@@ -93,6 +93,7 @@ void minipwd(){
   else{
     pwd();
   }
+}
 /*
 	To Benjamin
 	Here is how this function works
@@ -119,6 +120,12 @@ int redir(int oldfd, const char* newfile){
 	return dup2(newfd, oldfd);
 }
 
+//Not sure if this is overloading or accidental inclusion - Ben
+int readir(std::string oldfile, const char*newfile){
+  open(newfile, O_CREAT);
+
+}
+
 
 void exit(){
 	exit(EXIT_SUCCESS);
@@ -139,10 +146,6 @@ void cd(std::string directory){
 	}
 };
 
-int readir(std::string oldfile, newfile){
-  open(newfile, O_CREAT);
-
-}
 
 // BIG help in ls
 // https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
@@ -304,6 +307,7 @@ void ls(std::string directory){
 };
 
 void ls(){
+  std::cout << "\n"<<"Executing LS... "<< "No Directory"<<"\n";
   DIR* dir;
   struct dirent *entry;
   dir = opendir(get_current_dir_name());
@@ -565,7 +569,7 @@ void CallPrograms(char **seperated, int num_args){
 
         char * directory = seperated[1]; //TODO: check to see if it exists
         std::cout <<"directory "<< directory <<"\n";
-        //cd(directory);
+        cd(directory);
     }
     else if(run_program[0] == 'l' && run_program[1] == 's' && run_program[2] == '\0'){
 
@@ -574,37 +578,87 @@ void CallPrograms(char **seperated, int num_args){
             //std::cout <<"Passing in:  "<< directory <<"\n";
             //char * directory;
             std::cout << "\n"<<"Executing LS... "<< "Directory: "<< directory<<"\n";
-            //ls(directory);
+            ls(directory);
         }
         else{
-            std::cout << "\n"<<"Executing LS... "<< "No Directory"<<"\n";
-            //ls(" "); //IF NO ARGS, PASS IN NOTHING
+            char * directory = get_current_dir_name();
+
+            std::cout << "get dir " << get_current_dir_name()<< "\n";
+            ls(); //IF NO ARGS, PASS IN NOTHING
         }
 
     }
     else if(run_program[0] == 'p' && run_program[1] == 'w' && run_program[2] == 'd' && run_program[3] == '\0'){
-        //std::cout <<"Execute PWD "<<"\n";
-        //pwd();
+        std::cout <<"Execute PWD "<<"\n";
+        pwd();
     }
     else if(run_program[0] == 'e' && run_program[1] == 'x' && run_program[2] == 'i' && run_program[3] == 't' && run_program[4] == '\0'){
         std::cout <<"Execute EXIT "<<"\n";
-        //exit();
+        exit();
     }
     else if(run_program[0] == 'f' && run_program[1] == 'f' && run_program[2] == '\0'){
-        std::cout <<"Execute ff "<<"\n";
+        std::cout << "\n" << "Execute ff "<<"\n";
         char * filename = seperated[1];
-        //std::cout <<"Filename:  "<< filename <<"\n";
-        //ff(filename);
+
+        const char *file = "ff";
+        const char *dir = "fftest";
+
+
+        /*
+        const char *file = "ff";
+        const char *dir = "fftest";
+
+
+        std::cout << "Chaning current dir " << get_current_dir_name()<< "\n";
+        chdir(get_current_dir_name());
+        std::vector<std::string> vec;
+        vec = ffemptdir(file, NULL);
+        for(int i=0; i<vec.size(); ++i){
+          AshellPrint("Found locations in ");
+          AshellPrint(vec[i]);
+          AshellPrint("\n");
+         }
+         */
+        //format:
+        //std::vector<std::string> ff(const char* filename, const char* directory, const char* newdir)
+        //std::vector<std::string> ffemptdir(const char* filename, const char* newdir){\
+
+
+        //std::cout << "Chaning current dir " << get_current_dir_name()<< "\n";
+        dir = get_current_dir_name();
+        chdir(get_current_dir_name());
+        std::vector<std::string> vec;
+
+
+
+        //std::cout <<"Filename:  "<< filename << " Directory: " << dir << " New Dir: "<< "none"<<"\n";
+        //vec = ffemptdir(file, NULL); //to make Directory and new Dir fftest
+        //vec = ffemptdir(file, dir);
+        const char *newdir = NULL; //likely seperate[1]
+        std::cout <<"Filename:  "<< filename << " Directory: " << dir << " New Dir: "<< newdir <<"\n";
+        vec = ff(filename, dir,  newdir);
+
+        std::cout <<"ff vec size: "<< vec.size() <<"\n";
+        for(int i=0; i<vec.size(); ++i){
+          //AshellPrint("Found locations in ");
+          AshellPrint(vec[i]);
+          AshellPrint("\n");
+        }
+        //ff(filename, dir,  newdir);
     }
     else{
         std::cout <<"\n"<<"Run Exec(" << run_program<<");" <<"\n";
-        //exec(seperated);
+        exec(seperated);
     }
 
 
 }
 
 void parse(char *prog, char **parsed){
+
+
+
+
     //Parsing char array received, basically a split line function.
     //Currently seperates with ' ' TODO work with any character
 
@@ -634,7 +688,10 @@ void parse(char *prog, char **parsed){
 }
 
 void ReadAndParseCmd() {
-        std::string audible_bell = charString('\a'); //audible bell
+    //TODO: fix tab
+
+
+    std::string audible_bell = charString('\a'); //audible bell
 
     bool end_line = false;
     int max_size = 512;  	//TODO: switch to buffer or malloc system if necessary
@@ -686,6 +743,7 @@ void ReadAndParseCmd() {
         }
 
         //ARROW CASE *---
+        //TODO: ADJUST FOR MINIPWD ON BACKSPACE
         else if (arrow_flag && 0x5B != char_read){
 
             if(0x41 == char_read && num_lines != 0){
