@@ -518,7 +518,7 @@ int size_of(char *array){
 }
 int exec(char ** seperated, int * metadata){
                 std::cout <<"In exec  "  <<"\n";
-                std::cout <<"Meta:  "  << metadata[0]<< metadata[1]<< metadata[2]<<"\n";
+
                 //std::cout <<"Meta:  "  << metadata<<"\n";
                 pid_t pid;
                 pid_t parent_pid;
@@ -534,11 +534,12 @@ int exec(char ** seperated, int * metadata){
                 bool used_output = false;
                 bool used_input = false;
 
-                int num_args = metadata[0];
-                int num_seperated = metadata[1];
+                int num_seperated = metadata[0];
+                metadata[1] = metadata[0] + 1;
+                int num_args = metadata[1] + 1;
                 int num_pipes = metadata[2];
 \
-
+                std::cout <<"Meta:  "  << metadata[0]<< metadata[1]<< metadata[2]<<"\n";
 
 
                 for(int i = 0; i < num_seperated; i++){
