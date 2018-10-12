@@ -23,7 +23,7 @@ int main (int argc, char *argv[]) {
   minipwd();
   while(1){
     ReadAndParseCmd();
-    minipwd();
+    //minipwd();
   }
   //free everything, reset everything
 
