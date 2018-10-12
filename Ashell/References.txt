@@ -27,9 +27,19 @@ https://www.geeksforgeeks.org/char-vs-stdstring-vs-char-c/
 
 References in Parse
 http://www.cplusplus.com/reference/cstring/strtok/
+//https://stackoverflow.com/questions/26597977/split-string-with-multiple-delimiters-using-strtok-in-c
+//http://www.cplusplus.com/reference/cstring/strtok/
 
 For Shell explanations
 Operating System Principles & Practices Second Edition (Thomas Anderson and Michael Dahlin)
 
 Error codes
 http://www.virtsync.com/c-error-codes-include-errno
+
+exec:
+ //https://www.geeksforgeeks.org/dup-dup2-linux-system-call/
+ https://unix.stackexchange.com/questions/122977/what-is-the-correct-name-for-the-command
+ //https://stackoverflow.com/questions/40565197/pipe-usage-in-c
+ https://stackoverflow.com/questions/25722730/cannot-dup2-write-end-of-a-pipe-to-stdout
+ //https://stackoverflow.com/questions/40565197/pipe-usage-in-c
+ //https://stackoverflow.com/questions/40565197/pipe-usage-in-c
