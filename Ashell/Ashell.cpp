@@ -541,7 +541,13 @@ int exec(char ** seperated, int * metadata){
                 int num_args = metadata[1] + 1;
                 int num_pipes = metadata[2];
 \
-                //std::cout <<"Meta:  "  << " splits: " << metadata[0]<< " args: " << metadata[1] << " pipes: " << metadata[2]<<"\n";
+                std::cout <<"Meta:  "  << " splits: " << metadata[0]<< " args: " << metadata[1] << " pipes: " << metadata[2]<<"\n";
+                /*
+                for(int x = 0; x <num_seperated; x++){
+                    std::cout <<"Seperated:  "  << num_seperated<<seperated[x]<<"\n";
+                }
+                */
+
 
 
                 for(int i = 0; i < num_seperated; i++){
@@ -804,11 +810,59 @@ void parse(char *prog, char **parsed){
     //Currently seperates with ' ' TODO work with any character
 
     int i = 0;
+    int j = 0; //num pipes
+
+    int num_pipes;
+    int num_right;
+    int num_left;
+    int num_spaces;
+    int num_tokens;
     char split_memory[110];
     char * split = split_memory;
     char * seperated[15] = {0}; //initialize to zero or seg fault in ls call
     //https://stackoverflow.com/questions/26597977/split-string-with-multiple-delimiters-using-strtok-in-c
     char delimit[]=" \<\>\|";
+    char tokens[5];
+    for(int x = 0; x < strlen(prog)+1;++x){
+        //std::cout <<prog[x - 1]<<"\n";
+        if(prog[x-1]== '<'){
+            num_left++;
+            tokens[num_tokens] = '<';
+            num_tokens++;
+
+
+        }
+        else if(prog[x-1]== '>'){
+            num_right++;
+            tokens[num_tokens] = '>';
+            num_tokens++;
+            tokens[x] = 'b';
+        }
+        else if(prog[x-1]== '|'){
+            num_pipes++;
+            tokens[num_tokens] = '|';
+            num_tokens++;
+        }
+        else if(prog[x-1] == ' '){ //may need to be space ascii
+            //std::cout <<"space, x: "<<num_tokens<<"\n";
+            num_spaces++;
+            tokens[num_tokens] = ' ';
+            num_tokens++;
+        }
+
+    }
+
+    //TOKEN TESTING
+    /*
+    std::cout <<"\n"<<"tokens: " << num_tokens <<"\n";
+    std::cout <<"\n"<<"tokens: ";
+    for(int z = 0; z < num_tokens ;++z){
+       std::cout<< tokens[z] << ",";
+    }
+    std::cout <<"\n";
+    */
+
+
     //http://www.cplusplus.com/reference/cstring/strtok/
     split = strtok(prog, delimit);
 
@@ -902,8 +956,8 @@ void ReadAndParseCmd() {
                     AshellPrint("\b \b");
                 }
 
-                                num_lines--;			//set line number
-                                prog = hist[num_lines];	//set program to history
+                num_lines--;			//set line number
+                prog = hist[num_lines];	//set program to history
                 AshellPrint(prog);		//print program
 
                 arrow_flag = false;		//out of arrow
