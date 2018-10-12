@@ -537,11 +537,15 @@ int exec(char ** seperated, int * metadata){
                 bool used_input = false;
 
                 int num_seperated = metadata[0];
+
+
+                //METADATA
+                //0 - num splits, 1 - num args, 2 - num pipes, 3 - num right, 4 - num left, 5 - num spaces
                 metadata[1] = metadata[0] + 1;
-                int num_args = metadata[1] + 1;
-                int num_pipes = metadata[2];
+                int num_args = metadata[1] + 1; // this has to be +1
+
 \
-                std::cout <<"Meta:  "  << " splits: " << metadata[0]<< " args: " << metadata[1] << " pipes: " << metadata[2]<<"\n";
+                std::cout <<"Meta:  "  << " splits: " << metadata[0]<< " args: " << metadata[1] << " pipes: " << metadata[2]<<" right: " << metadata[3]<<" left: " << metadata[4]<<" spaces: " << metadata[5]<<"\n";
                 /*
                 for(int x = 0; x <num_seperated; x++){
                     std::cout <<"Seperated:  "  << num_seperated<<seperated[x]<<"\n";
@@ -803,7 +807,8 @@ void CallPrograms(char **seperated, int * metadata){
 
 void parse(char *prog, char **parsed){
 
-    int metadata[] = {0,0,0};
+    int metadata[] = {0,0,0,0,0,0};
+    //0 - num splits, 1 - num args, 2 - num pipes, 3 - num right, 4 - num left, 5 - num spaces
 
 
     //Parsing char array received, basically a split line function.
@@ -822,7 +827,7 @@ void parse(char *prog, char **parsed){
     char * seperated[15] = {0}; //initialize to zero or seg fault in ls call
     //https://stackoverflow.com/questions/26597977/split-string-with-multiple-delimiters-using-strtok-in-c
     char delimit[]=" \<\>\|";
-    char tokens[5];
+    char tokens[10];
     for(int x = 0; x < strlen(prog)+1;++x){
         //std::cout <<prog[x - 1]<<"\n";
         if(prog[x-1]== '<'){
@@ -851,6 +856,10 @@ void parse(char *prog, char **parsed){
         }
 
     }
+    metadata[2] = num_pipes;
+    metadata[3] = num_right;
+    metadata[4] = num_left;
+    metadata[5] = num_spaces;
 
     //TOKEN TESTING
     /*
