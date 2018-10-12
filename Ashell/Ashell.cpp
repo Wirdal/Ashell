@@ -674,7 +674,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                 //if it is not one of the commands:
                                 std::cout <<"execvp("  << seperated[0] << " " << *seperated << ")"<<"\n"; //if returns, error
                                 execvp(seperated[0], seperated);
-                                std::cout <<"END " <<"\n";
+                                std::cout <<"FAILED TO  " <<"\n";
                                 exit(EXIT_FAILURE);		//https://stackoverflow.com/questions/13667364/exit-failure-vs-exit1
                                 //std::cout <<"END " <<"\n";
                                 //parent
