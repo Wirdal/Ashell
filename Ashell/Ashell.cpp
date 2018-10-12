@@ -60,15 +60,6 @@ void AshellPrint(int output){
         AshellPrint(out2.c_str());
 };
 
-size_t AshellRead(int fd, void *buf, size_t count){
-//TODO
-};
-
-int AshellOpen(const char *path, int flags, .../*, mode_t mode*/){
-//TODO
-};
-// Shell commands
-
 
 void pwd(){
         char *path = get_current_dir_name();
@@ -93,23 +84,7 @@ void minipwd(){
     pwd();
   }
 }
-/*
-        To Benjamin
-        Here is how this function works
-        You supply it the file descriptor of something
-                If you dont have a FD, you're probably parsing a command first
-                Use 1 as oldfd then
-        then give it a filename.
-        Then execute the command, and you should see the input accordingly
-        If you're storing tokens in a vector, remember what I said in the CSIF
-        You can iterate through that list till the index is to the second to last
-        And call my fn on index, and index+1
-        It should chain them all appropriatly.
-        If you get any weirdness with executing things after that, it might this thing. I am unsure if it closes after use
-        Sincerly
-        Chase Maguire
-        XOXOX
-*/
+
 int redir(int oldfd, const char* newfile){
 
         int newfd = open(newfile, O_CREAT|O_WRONLY|O_TRUNC);
@@ -522,10 +497,6 @@ int size_of(char *array){
     return i;
 }
 int exec(char ** seperated, int * metadata, char * tokens){
-                //std::cout <<"In exec  "  <<"\n";
-                //std::cout <<"tokens:  "  <<tokens[1]<<"\n";
-
-                //std::cout <<"Meta:  "  << metadata<<"\n";
                 pid_t pid;
                 pid_t parent_pid;
                 pid_t child_pid;
@@ -549,23 +520,15 @@ int exec(char ** seperated, int * metadata, char * tokens){
                 int num_args = metadata[1] + 1; // this has to be +1
 
 \
-                //std::cout <<"Meta:  "  << " splits: " << metadata[0]<< " args: " << metadata[1] << " pipes: " << metadata[2]<<" right: " << metadata[3]<<" left: " << metadata[4]<<" spaces: " << metadata[5]<<"\n";
-                /*
-                for(int x = 0; x <num_seperated; x++){
-                    std::cout <<"Seperated:  "  << num_seperated<<seperated[x]<<"\n";
-                }
-                */
 
-
-                //std::cout <<"num_args:"  << num_args <<"\n";
+                //For each argument
                 for(int i = 0; i < num_args; i++){
-                        //std::cout <<"START FORK sep = "  << i <<"\n";
+
                         int input;
                         int output;
 
-                        //std::cout <<"process ID pre fork:  "  << pid <<"\n";
                         //https://www.geeksforgeeks.org/c-program-demonstrate-fork-and-pipe/
-                        //std::cout <<"FORK"<<"\n";
+                        //FORK
                         pipe(fd);
                         pid = fork(); //two process running
                         num_children++;
@@ -575,15 +538,10 @@ int exec(char ** seperated, int * metadata, char * tokens){
                         //child
                         //http://man7.org/linux/man-pages/man2/getpid.2.html
                         if(pid == -1){
-                                        //std::cout <<"fork error "  << pid <<"\n";
-                                        //exit();
+                            exit();
                         }
                         else if (pid == 0){
                                         //child process: exec
-                                        //std::cout <<"child process: " <<"\n";
-                                        //std::cout <<"child: "  << getpid() << " parent: "<< getppid()<<"\n";
-                                        //std::cout <<"exec: "  << execvp(seperated[0], seperated)<<"\n"; //if returns, error
-
 
                                         //getpid() returns PID of calling process
                                         //getppid() returns PID of the parent of the calling process (ID of parent, or ID of reparented)
@@ -596,21 +554,16 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                         //chaining commands with chase's fn
                                         //i+1 is the next command
                                         if(i + 1 < num_args && tokens[i] == '>'){
-                                                //std::cout <<"recognize > "<<"\n";
-                                                //std::cout <<"sep[i + 1]: " <<seperated[i + 1] <<"\n";
+
                                                 const char* newfile = seperated[i + 1];
-                                                //std::cout <<"new file: " << newfile <<"\n";
+
 
                                                 //return dup2(newfd, oldfd);
                                                 output = redir(0, newfile); //old fd, newfile
                                                 used_output = true;
                                         }
                                         if(i + 1 < num_args && tokens[i] == '<'){
-
-                                                //std::cout <<"sep[i + 1]: " <<seperated[i + 1] <<"\n";
                                                 const char* newfile = seperated[i + 1];
-                                                //std::cout <<"new file: " << newfile <<"\n";
-
                                                 //return dup2(newfd, oldfd);
                                                 input = redir(0, newfile); //old fd, newfile
                                                 //check if input == -1
@@ -618,11 +571,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                         }
                                         if(i + 2 < num_args && tokens[i + 1] == '>'){
 
-                                                std::cout <<"sep[i + 2]: " <<seperated[i + 2] <<"\n";
                                                 const char* newfile = seperated[i + 2];
-                                                std::cout <<"new file: " << newfile <<"\n";
-
-                                                //return dup2(newfd, oldfd);
                                                 output = redir(0, newfile); //old fd, newfile
                                                 //check if input == -1
                                                 used_output = true;
@@ -631,25 +580,19 @@ int exec(char ** seperated, int * metadata, char * tokens){
 
                                 if(num_children != num_args){
                                         //if its not a leaf child: output the childs output to STDOUT
-                                        //std::cout <<"not leaf child"<<"\n";
+                                        //https://stackoverflow.com/questions/40565197/pipe-usage-in-c
 
-                                        //std::cout <<"NOT LEAF CHILD: " <<"\n";
-                                        //const char* newfile = fd[WRITE_END];			//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
 
-                                        //std::cout <<"new file: " << newfile <<"\n";
-
-                                        //return dup2(newfd, oldfd);
-                                        //output = redir(STDOUT_FILENO, newfile) //old fd, newfile https://stackoverflow.com/questions/12902627/the-difference-between-stdout-and-stdout-fileno-in-linux-c
-
+                                        //https://stackoverflow.com/questions/12902627/the-difference-between-stdout-and-stdout-fileno-in-linux-c
                                         //Helpful: https://stackoverflow.com/questions/25722730/cannot-dup2-write-end-of-a-pipe-to-stdout
                                         dup2(fd[WRITE_END], STDOUT_FILENO);
                                         if(used_input){
-                                                //input = redir(STDIN_FILENO, input) //not sure if we need to redirect, may just need to dup
+
                                                 dup2(input, STDIN_FILENO);
                                                 close(input);
                                         }
                                         if(used_output){
-                                                //output = redir(STDOUT_FILENO, output)
+
                                                 dup2(output, STDOUT_FILENO);
                                                 close(output);
                                         }
@@ -657,16 +600,14 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                 }
                                 else{
                                         //if its the last child: replace STDOUT with file
-                                        //std::cout <<"last child"<<"\n";
                                         if(used_input){
                                                 //input = redir(STDIN_FILENO, input) //not sure if we need to redirect, may just need to dup
-                                                std::cout <<"final in: " << output<<"\n";
+
                                                 dup2(input, STDIN_FILENO);
                                                 close(input);
                                         }
                                         if(used_output){
                                                 //output = redir(STDOUT_FILENO, output)
-                                                std::cout <<"final out: " << output<<"\n";
                                                 dup2(output, STDOUT_FILENO);
                                                 close(output);
                                         }
@@ -675,36 +616,35 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                 close(fd[READ_END]);		//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
 
                                 //if it is not one of the commands:
-                                std::cout <<"execvp("  << seperated[0] << " " << *seperated << ")"<<"\n"; //if returns, error
+
                                 if(execvp(seperated[0], seperated)){
+                                    //AshellPrint("\n");
                                     AshellPrint("Failed to execute ");
                                     AshellPrint(seperated[0]);
                                     AshellPrint("\n");
+                                    minipwd();
                                     exit(EXIT_FAILURE);
+
                                 }
-                                //std::cout <<"FAILED TO  " <<"\n";
-                                                //https://stackoverflow.com/questions/13667364/exit-failure-vs-exit1
-                                //std::cout <<"END " <<"\n";
+
                                 //parent
-                                                //wait for it to finish
+                                //wait for it to finish
                         }
                         else{
                                         //parent process: child executed, parent wait for child to finish
-                                        //std::cout <<"WAIT " <<"\n";
-                                        //std::cout <<"parent process: " <<"\n";
-                                        //std::cout <<"parent: "  << getpid() << " child: "<< pid<<"\n";
                                         waitpid(pid, &status, WEXITED); //https://linux.die.net/man/2/waitpid PID
-                                        //std::cout <<"child returned, status: "  << status << " WEXITED: " << WEXITED << "\n";
-
                                         //close fd[WRITE_END];
                                         fd_old = fd[READ_END];
-                                        //std::cout <<"WAIT " <<"\n";
+
+
 
 
 
                         }
 
+
                 }
+                AshellPrint("\n");
                 //minipwd();
                 //OUTSIDE OF FOR
 
@@ -715,15 +655,10 @@ int exec(char ** seperated, int * metadata, char * tokens){
 }
 void CallPrograms(char **seperated, int * metadata, char * tokens){
     char * run_program = seperated[0]; //the first argument is the program to run
-    //std::cout <<"tok in callprog: "<< tokens <<"\n";
     //wrong - metadata[0] = num_args+1;
     int num_args = metadata[0] - 1; //this is actually num of splits
-
     if(run_program[0] == 'c' && run_program[1] == 'd' && run_program[2] == '\0'){
-        //std::cout <<"Execute CD "<<"\n";
-        //std::cout <<"directory "<< directory <<"\n";
         char * directory = seperated[1]; //TODO: check to see if it exists
-
         cd(directory);
         minipwd();
     }
@@ -731,74 +666,45 @@ void CallPrograms(char **seperated, int * metadata, char * tokens){
 
         if(metadata[0]>0){ //fixes seg fault - if there is a splitter
             char * directory = seperated[1];
-            //std::cout <<"Passing in:  "<< directory <<"\n";
             //char * directory;
-            //std::cout << "\n"<<"Executing LS... "<< "Directory: "<< directory<<"\n";
             ls(directory);
             minipwd();
         }
         else{
             char * directory = get_current_dir_name();
-
-            //std::cout << "get dir " << get_current_dir_name()<< "\n";
             ls(); //IF NO ARGS, PASS IN NOTHING
-            //AshellPrint("\n");
             minipwd();
         }
 
     }
     else if(run_program[0] == 'p' && run_program[1] == 'w' && run_program[2] == 'd' && run_program[3] == '\0'){
-        //std::cout <<"Execute PWD "<<"\n";
+
         AshellPrint("\n");
         pwd();
         minipwd();
     }
     else if(run_program[0] == 'e' && run_program[1] == 'x' && run_program[2] == 'i' && run_program[3] == 't' && run_program[4] == '\0'){
-        //std::cout <<"Execute EXIT "<<"\n";
+        AshellPrint("\n");
         exit();
     }
     else if(run_program[0] == 'f' && run_program[1] == 'f' && run_program[2] == '\0'){
-        //std::cout << "\n" << "Execute ff "<<"\n";
         char * filename = seperated[1];
 
         const char *file = "ff";
         const char *dir = "fftest";
 
-
-        /*
-        const char *file = "ff";
-        const char *dir = "fftest";
-        std::cout << "Chaning current dir " << get_current_dir_name()<< "\n";
-        chdir(get_current_dir_name());
-        std::vector<std::string> vec;
-        vec = ffemptdir(file, NULL);
-        for(int i=0; i<vec.size(); ++i){
-          AshellPrint("Found locations in ");
-          AshellPrint(vec[i]);
-          AshellPrint("\n");
-         }
-         */
-        //format:
-        //std::vector<std::string> ff(const char* filename, const char* directory, const char* newdir)
-        //std::vector<std::string> ffemptdir(const char* filename, const char* newdir){\
-
-        //std::cout << "Chaning current dir " << get_current_dir_name()<< "\n";
         dir = get_current_dir_name();
         chdir(get_current_dir_name());
         std::vector<std::string> vec;
 
-
-
-        //std::cout <<"Filename:  "<< filename << " Directory: " << dir << " New Dir: "<< "none"<<"\n";
         //vec = ffemptdir(file, NULL); //to make Directory and new Dir fftest
         //vec = ffemptdir(file, dir);
         const char *newdir = NULL; //likely seperate[1]
-        //std::cout <<"Filename:  "<< filename << " Directory: " << dir << " New Dir: "<< newdir <<"\n";
         vec = ff(filename, dir,  newdir);
 
         AshellPrint("\n");
         for(int i=0; i<vec.size(); ++i){
-          //AshellPrint("Found locations in ");
+          //found locations in:
           AshellPrint(vec[i]);
           AshellPrint("\n");
         }
@@ -806,10 +712,7 @@ void CallPrograms(char **seperated, int * metadata, char * tokens){
         minipwd();
     }
     else{
-        //std::cout <<"\n"<<"Run Exec(" << run_program<<");" <<"\n";
-        //std::cout <<"tok in pre exec: "<< tokens <<"\n";
         exec(seperated, metadata,tokens);
-
     }
 
 
@@ -821,9 +724,8 @@ void parse(char *prog, char **parsed){
     int metadata[] = {0,0,0,0,0,0};
     //0 - num splits, 1 - num args, 2 - num pipes, 3 - num right, 4 - num left, 5 - num spaces
 
-
+    char delimit[]=" \<\>\|"; //https://stackoverflow.com/questions/26597977/split-string-with-multiple-delimiters-using-strtok-in-c
     //Parsing char array received, basically a split line function.
-    //Currently seperates with ' ' TODO work with any character
 
     int i = 0;
     int j = 0; //num pipes
@@ -836,11 +738,10 @@ void parse(char *prog, char **parsed){
     char split_memory[110];
     char * split = split_memory;
     char * seperated[15] = {0}; //initialize to zero or seg fault in ls call
-    //https://stackoverflow.com/questions/26597977/split-string-with-multiple-delimiters-using-strtok-in-c
-    char delimit[]=" \<\>\|";
+
+
     char tokens[10];
     for(int x = 0; x < strlen(prog)+1;++x){
-        //std::cout <<prog[x - 1]<<"\n";
         if(prog[x-1]== '<'){
             num_left++;
             tokens[num_tokens] = '<';
@@ -860,7 +761,6 @@ void parse(char *prog, char **parsed){
             num_tokens++;
         }
         else if(prog[x-1] == ' '){ //may need to be space ascii
-            //std::cout <<"space, x: "<<num_tokens<<"\n";
             num_spaces++;
             tokens[num_tokens] = ' ';
             num_tokens++;
@@ -877,26 +777,22 @@ void parse(char *prog, char **parsed){
 
     while (split != NULL){
         seperated[i] = split;
-        //std::cout <<"seperated[" << i << "] "<< seperated[i] << "\n";
         parsed[i] = split;
-        //Not sure what split becomes
         split = strtok(NULL, delimit);
         ++i;
-        //NUMBER OF ARGS IS i
+        //number of args is i
 
     }
     seperated[i] = split;
 
     char * run_program = seperated[0];
     metadata[0] = i -1;
-    //std::cout <<"\n"<<"num_splits: " << i <<"\n";
-    //std::cout <<"tok Call: "<<tokens[1] <<"\n";
+
+    //Call the correct program now that the data is collected
     CallPrograms(seperated, metadata, tokens);
 }
 
 void ReadAndParseCmd() {
-    //TODO: fix tab
-
 
     std::string audible_bell = charString('\a'); //audible bell
 
@@ -906,30 +802,23 @@ void ReadAndParseCmd() {
     int num_lines;
     int num_lines_tot;
 
-
-
     size_t bytes_read = 0;
 
 
-        //Setting up memory
+    //Setting up memory
     char prog_mem[100] = ""; //TODO: find max size
     char args_mem[100] = ""; //TODO: is this read-only memory
 
-
     char * prog = prog_mem; //Array containing chars until enter hit
     char *args = args_mem; 	//Input after the command/program
-        //char * parsed; 			//to contain parsed input
 
     char hist[10][10];
-        char char_read = '\0';
+    char char_read = '\0';
 
 
     bool arrow_flag;
 
     int max_bytes = 1; //reads at most 1 byte at a time
-
-    //this may need to be STDIN_FILENO TODO
-    int fd_read = 0; //this if the fd (file descriptor) for read
 
 
     struct termios SavedTermAttributes; //from noncanmode.c
@@ -945,45 +834,35 @@ void ReadAndParseCmd() {
 
         //EOT (end of transit) CASE *---
         if(0x04 == char_read){ // C-d
-            //std::cout <<"its something else entirely..." << "\n";
             break;
         }
 
         //ARROW CASE *---
-        //TODO: ADJUST FOR MINIPWD ON BACKSPACE
         else if (arrow_flag && 0x5B != char_read){
-
             if(0x41 == char_read && num_lines != 0){
                 //UPARROW
-
-
-
-
-
-                                //Delete old command
+                //Delete old command
                 for(int n = 0; n < num_chars + 12; n++){
                     AshellPrint("\b \b");
                 }
 
                 num_lines--;			//set line number
-                prog = hist[num_lines];	//set program to history
+                prog = hist[num_lines];         //set program to history
                 minipwd();
                 AshellPrint(prog);		//print program
 
                 arrow_flag = false;		//out of arrow
             }
-                        else if(0x41 == char_read && num_lines == 0){
-                                //Audible bell up
-                                AshellPrint(audible_bell);
+            else if(0x41 == char_read && num_lines == 0){
+                //Audible bell up
+                AshellPrint(audible_bell);
                         }
             else if(0x42 == char_read && num_lines != num_lines_tot){
                 //DOWNARROW
-
-                                //Delete old command
+                //Delete old command
                 for(int n = 0; n < num_chars + 12; n++){
                     AshellPrint("\b \b");
                 }
-
                 num_lines++;			//set line number
                 prog = hist[num_lines];	//set program to history
 
@@ -1009,42 +888,36 @@ void ReadAndParseCmd() {
 
         }
         else if (arrow_flag && 0x5B == char_read){
-                        //Possibly an arrow key, set flag true and check next char above
+            //Possibly an arrow key, set flag true and check next char above
             arrow_flag = true;
         }
 
-                //BACKSPACE CASE *---
+       //BACKSPACE CASE *---
         else if (0x7F == char_read && num_chars > 0){
             AshellPrint("\b \b"); 	//outputs backspace
-                        num_chars= num_chars - 2;
-                        //std::cout <<"Passing in:  " <<"\n";
-                        //std::cout<<num_chars; 					//corrects number of chars entered
+            num_chars= num_chars - 2;
+           //corrects number of chars entered
             prog[num_chars] = char_read;	//replaces location in memory to backspace (maybe should be '\0'?)
         }
-                else if (0x7F == char_read && num_chars <= 0){
-                        AshellPrint(audible_bell);
-                        num_chars--;
+        else if (0x7F == char_read && num_chars <= 0){
+             AshellPrint(audible_bell);
+             num_chars--;
         }
 
         //STANDARD CASE (if the char can be printed) *---
         else if (isprint(char_read)){
             prog[num_chars] = char_read;					//sets location in memory to the printable char
-            std::string str1 = charString(prog[num_chars]); //converts prog[i] to string so it can work with AshellPrint
-            AshellPrint(str1);								//prints char to shell
+            std::string str1 = charString(prog[num_chars]);                     //converts prog[i] to string so it can work with AshellPrint
+            AshellPrint(str1);                                                  //prints char to shell
         }
         //ENTER CASE *---
         else if (0x0A == char_read) {
-                        //exit the loop
-            for(int j = 0; j < num_chars + 1; ++j){
-                //std::cout <<prog[j - 1] <<"\n";
-            }
-
+           //exit the loop
             end_line = true;
-
         }
-                //ARROW CASE	*---
+        //ARROW CASE INITIATOR	*---
         else{
-                        //Possibly an arrow key, set flag true and check next char above
+            //Possibly an arrow key, set flag true and check next char above
             arrow_flag = true;
         }
 
