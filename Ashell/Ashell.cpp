@@ -133,15 +133,21 @@ void exit(){
 void cd(const char* directory){
         int err = chdir(directory);
         if (-1 == err){
-                AshellPrint("Error changing directory \n");
+                AshellPrint("\nError changing directory \n");
+        }
+        else{
+            AshellPrint("\n");
         }
 };
 void cd(std::string directory){
         const char* cdirectory = directory.c_str();
         int err = chdir(cdirectory);
         if (-1 == err){
-                AshellPrint("Error changing directory \n");
+                AshellPrint("\nError changing directory \n");
 
+        }
+        else{
+            AshellPrint("\n");
         }
 };
 
@@ -672,9 +678,9 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                 close(fd[READ_END]);		//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
 
                                 //if it is not one of the commands:
-                                std::cout <<"execvp("  << seperated[0] << " " << *seperated << ")"<<"\n"; //if returns, error
+                                //std::cout <<"execvp("  << seperated[0] << " " << *seperated << ")"<<"\n"; //if returns, error
                                 execvp(seperated[0], seperated);
-                                std::cout <<"FAILED TO  " <<"\n";
+                                //std::cout <<"FAILED TO  " <<"\n";
                                 exit(EXIT_FAILURE);		//https://stackoverflow.com/questions/13667364/exit-failure-vs-exit1
                                 //std::cout <<"END " <<"\n";
                                 //parent
@@ -682,7 +688,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
                         }
                         else{
                                         //parent process: child executed, parent wait for child to finish
-                                        std::cout <<"WAIT " <<"\n";
+                                        //std::cout <<"WAIT " <<"\n";
                                         //std::cout <<"parent process: " <<"\n";
                                         //std::cout <<"parent: "  << getpid() << " child: "<< pid<<"\n";
                                         waitpid(pid, &status, WEXITED); //https://linux.die.net/man/2/waitpid PID
@@ -725,7 +731,7 @@ void CallPrograms(char **seperated, int * metadata, char * tokens){
             char * directory = seperated[1];
             //std::cout <<"Passing in:  "<< directory <<"\n";
             //char * directory;
-            std::cout << "\n"<<"Executing LS... "<< "Directory: "<< directory<<"\n";
+            //std::cout << "\n"<<"Executing LS... "<< "Directory: "<< directory<<"\n";
             ls(directory);
             minipwd();
         }
@@ -741,6 +747,7 @@ void CallPrograms(char **seperated, int * metadata, char * tokens){
     }
     else if(run_program[0] == 'p' && run_program[1] == 'w' && run_program[2] == 'd' && run_program[3] == '\0'){
         //std::cout <<"Execute PWD "<<"\n";
+        AshellPrint("\n");
         pwd();
         minipwd();
     }
@@ -749,7 +756,7 @@ void CallPrograms(char **seperated, int * metadata, char * tokens){
         exit();
     }
     else if(run_program[0] == 'f' && run_program[1] == 'f' && run_program[2] == '\0'){
-        std::cout << "\n" << "Execute ff "<<"\n";
+        //std::cout << "\n" << "Execute ff "<<"\n";
         char * filename = seperated[1];
 
         const char *file = "ff";
@@ -787,10 +794,10 @@ void CallPrograms(char **seperated, int * metadata, char * tokens){
         //vec = ffemptdir(file, NULL); //to make Directory and new Dir fftest
         //vec = ffemptdir(file, dir);
         const char *newdir = NULL; //likely seperate[1]
-        std::cout <<"Filename:  "<< filename << " Directory: " << dir << " New Dir: "<< newdir <<"\n";
+        //std::cout <<"Filename:  "<< filename << " Directory: " << dir << " New Dir: "<< newdir <<"\n";
         vec = ff(filename, dir,  newdir);
 
-        std::cout <<"ff vec size: "<< vec.size() <<"\n";
+        AshellPrint("\n");
         for(int i=0; i<vec.size(); ++i){
           //AshellPrint("Found locations in ");
           AshellPrint(vec[i]);
@@ -800,7 +807,7 @@ void CallPrograms(char **seperated, int * metadata, char * tokens){
         minipwd();
     }
     else{
-        std::cout <<"\n"<<"Run Exec(" << run_program<<");" <<"\n";
+        //std::cout <<"\n"<<"Run Exec(" << run_program<<");" <<"\n";
         //std::cout <<"tok in pre exec: "<< tokens <<"\n";
         exec(seperated, metadata,tokens);
 
@@ -966,12 +973,13 @@ void ReadAndParseCmd() {
 
 
                                 //Delete old command
-                for(int n = 0; n < num_chars; n++){
+                for(int n = 0; n < num_chars + 12; n++){
                     AshellPrint("\b \b");
                 }
 
                 num_lines--;			//set line number
                 prog = hist[num_lines];	//set program to history
+                minipwd();
                 AshellPrint(prog);		//print program
 
                 arrow_flag = false;		//out of arrow
@@ -984,12 +992,14 @@ void ReadAndParseCmd() {
                 //DOWNARROW
 
                                 //Delete old command
-                for(int n = 0; n < num_chars; n++){
+                for(int n = 0; n < num_chars + 12; n++){
                     AshellPrint("\b \b");
                 }
 
-                                num_lines++;			//set line number
-                                prog = hist[num_lines];	//set program to history
+                num_lines++;			//set line number
+                prog = hist[num_lines];	//set program to history
+
+                minipwd();
                 AshellPrint(prog);		//print program
 
                 arrow_flag = false;		//out of arrow
