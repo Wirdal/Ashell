@@ -554,14 +554,15 @@ int exec(char ** seperated, int * metadata, char * tokens){
                 */
 
 
-
-                for(int i = 0; i < num_seperated; i++){
+                std::cout <<"num_args:"  << num_args <<"\n";
+                for(int i = 0; i < num_args; i++){
                         std::cout <<"START FORK sep = "  << i <<"\n";
                         int input;
                         int output;
 
                         //std::cout <<"process ID pre fork:  "  << pid <<"\n";
                         //https://www.geeksforgeeks.org/c-program-demonstrate-fork-and-pipe/
+                        std::cout <<"FORK"<<"\n";
                         pipe(fd);
                         pid = fork(); //two process running
                         num_children++;
@@ -591,7 +592,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
 
                                         //chaining commands with chase's fn
                                         //i+1 is the next command
-                                        if(i + 1 < num_seperated && tokens[i] == '>'){
+                                        if(i + 1 < num_args && tokens[i] == '>'){
                                                 std::cout <<"recognize > "<<"\n";
                                                 std::cout <<"sep[i + 1]: " <<seperated[i + 1] <<"\n";
                                                 const char* newfile = seperated[i + 1];
@@ -601,7 +602,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                                 output = redir(0, newfile); //old fd, newfile
                                                 used_output = true;
                                         }
-                                        if(i + 1 < num_seperated && tokens[i] == '<'){
+                                        if(i + 1 < num_args && tokens[i] == '<'){
 
                                                 std::cout <<"sep[i + 1]: " <<seperated[i + 1] <<"\n";
                                                 const char* newfile = seperated[i + 1];
@@ -612,7 +613,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                                 //check if input == -1
                                                 used_input = true;
                                         }
-                                        if(i + 2 < num_seperated && tokens[i + 1] == '>'){
+                                        if(i + 2 < num_args && tokens[i + 1] == '>'){
 
                                                 std::cout <<"sep[i + 2]: " <<seperated[i + 2] <<"\n";
                                                 const char* newfile = seperated[i + 2];
@@ -625,7 +626,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                         }
 
 
-                                if(num_children != num_seperated){
+                                if(num_children != num_args){
                                         //if its not a leaf child: output the childs output to STDOUT
                                         std::cout <<"not leaf child"<<"\n";
 
@@ -675,7 +676,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                 execvp(seperated[0], seperated);
                                 std::cout <<"END " <<"\n";
                                 exit(EXIT_FAILURE);		//https://stackoverflow.com/questions/13667364/exit-failure-vs-exit1
-                                std::cout <<"END " <<"\n";
+                                //std::cout <<"END " <<"\n";
                                 //parent
                                                 //wait for it to finish
                         }
