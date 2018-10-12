@@ -660,7 +660,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                 }
                                 else{
                                         //if its the last child: replace STDOUT with file
-                                        std::cout <<"last child"<<"\n";
+                                        //std::cout <<"last child"<<"\n";
                                         if(used_input){
                                                 //input = redir(STDIN_FILENO, input) //not sure if we need to redirect, may just need to dup
                                                 std::cout <<"final in: " << output<<"\n";
@@ -873,17 +873,6 @@ void parse(char *prog, char **parsed){
     metadata[4] = num_left;
     metadata[5] = num_spaces;
 
-    //TOKEN TESTING
-    /*
-    std::cout <<"\n"<<"tokens: " << num_tokens <<"\n";
-    std::cout <<"\n"<<"tokens: ";
-    for(int z = 0; z < num_tokens ;++z){
-       std::cout<< tokens[z] << ",";
-    }
-    std::cout <<"\n";
-    */
-
-
     //http://www.cplusplus.com/reference/cstring/strtok/
     split = strtok(prog, delimit);
 
@@ -918,7 +907,7 @@ void ReadAndParseCmd() {
     int num_lines;
     int num_lines_tot;
 
-    char test_array[100] = "12345678";
+
 
     size_t bytes_read = 0;
 
