@@ -149,6 +149,7 @@ void cd(std::string directory){
 // BIG help in ls
 // https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
 void ls(const char* directory){
+  AshellPrint("\n");
   DIR* dir;
   struct dirent *entry;
   dir = opendir(directory);
@@ -228,6 +229,7 @@ void ls(const char* directory){
 };
 
 void ls(std::string directory){
+  AshellPrint("\n");
   DIR* dir;
   struct dirent *entry;
   dir = opendir(directory.c_str());
@@ -306,7 +308,7 @@ void ls(std::string directory){
 };
 
 void ls(){
-  std::cout << "\n"<<"Executing LS... "<< "No Directory"<<"\n";
+    AshellPrint("\n");
   DIR* dir;
   struct dirent *entry;
   dir = opendir(get_current_dir_name());
@@ -517,7 +519,7 @@ int size_of(char *array){
     return i;
 }
 int exec(char ** seperated, int * metadata){
-                std::cout <<"In exec  "  <<"\n";
+                //std::cout <<"In exec  "  <<"\n";
 
                 //std::cout <<"Meta:  "  << metadata<<"\n";
                 pid_t pid;
@@ -539,7 +541,7 @@ int exec(char ** seperated, int * metadata){
                 int num_args = metadata[1] + 1;
                 int num_pipes = metadata[2];
 \
-                std::cout <<"Meta:  "  << metadata[0]<< metadata[1]<< metadata[2]<<"\n";
+                //std::cout <<"Meta:  "  << " splits: " << metadata[0]<< " args: " << metadata[1] << " pipes: " << metadata[2]<<"\n";
 
 
                 for(int i = 0; i < num_seperated; i++){
@@ -612,6 +614,7 @@ int exec(char ** seperated, int * metadata){
 
                                 if(num_children != num_seperated){
                                         //if its not a leaf child: output the childs output to STDOUT
+                                        std::cout <<"not leaf child"<<"\n";
 
                                         //std::cout <<"NOT LEAF CHILD: " <<"\n";
                                         //const char* newfile = fd[WRITE_END];			//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
@@ -637,13 +640,16 @@ int exec(char ** seperated, int * metadata){
                                 }
                                 else{
                                         //if its the last child: replace STDOUT with file
+                                        std::cout <<"last child"<<"\n";
                                         if(used_input){
                                                 //input = redir(STDIN_FILENO, input) //not sure if we need to redirect, may just need to dup
+                                                std::cout <<"final in: " << output<<"\n";
                                                 dup2(input, STDIN_FILENO);
                                                 close(input);
                                         }
                                         if(used_output){
                                                 //output = redir(STDOUT_FILENO, output)
+                                                std::cout <<"final out: " << output<<"\n";
                                                 dup2(output, STDOUT_FILENO);
                                                 close(output);
                                         }
@@ -652,16 +658,17 @@ int exec(char ** seperated, int * metadata){
                                 close(fd[READ_END]);		//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
 
                                 //if it is not one of the commands:
-                                //std::cout <<"execvp("  << seperated[0] << " " << seperated << ")"<<"\n"; //if returns, error
+                                std::cout <<"execvp("  << seperated[0] << " " << *seperated << ")"<<"\n"; //if returns, error
                                 execvp(seperated[0], seperated);
+                                std::cout <<"END " <<"\n";
                                 exit(EXIT_FAILURE);		//https://stackoverflow.com/questions/13667364/exit-failure-vs-exit1
-
+                                std::cout <<"END " <<"\n";
                                 //parent
                                                 //wait for it to finish
                         }
                         else{
                                         //parent process: child executed, parent wait for child to finish
-                                        //std::cout <<"WAIT " <<"\n";
+                                        std::cout <<"WAIT " <<"\n";
                                         //std::cout <<"parent process: " <<"\n";
                                         //std::cout <<"parent: "  << getpid() << " child: "<< pid<<"\n";
                                         waitpid(pid, &status, WEXITED); //https://linux.die.net/man/2/waitpid PID
@@ -669,12 +676,14 @@ int exec(char ** seperated, int * metadata){
 
                                         //close fd[WRITE_END];
                                         fd_old = fd[READ_END];
+                                        //std::cout <<"WAIT " <<"\n";
 
 
 
                         }
 
                 }
+                //minipwd();
                 //OUTSIDE OF FOR
 
 
@@ -689,35 +698,40 @@ void CallPrograms(char **seperated, int * metadata){
     int num_args = metadata[0] - 1; //this is actually num of splits
 
     if(run_program[0] == 'c' && run_program[1] == 'd' && run_program[2] == '\0'){
-        std::cout <<"Execute CD "<<"\n";
-
+        //std::cout <<"Execute CD "<<"\n";
+        //std::cout <<"directory "<< directory <<"\n";
         char * directory = seperated[1]; //TODO: check to see if it exists
-        std::cout <<"directory "<< directory <<"\n";
+
         cd(directory);
+        minipwd();
     }
     else if(run_program[0] == 'l' && run_program[1] == 's' && run_program[2] == '\0'){
 
-        if(num_args>0){ //fixes seg fault
+        if(metadata[0]>0){ //fixes seg fault - if there is a splitter
             char * directory = seperated[1];
             //std::cout <<"Passing in:  "<< directory <<"\n";
             //char * directory;
             std::cout << "\n"<<"Executing LS... "<< "Directory: "<< directory<<"\n";
             ls(directory);
+            minipwd();
         }
         else{
             char * directory = get_current_dir_name();
 
-            std::cout << "get dir " << get_current_dir_name()<< "\n";
+            //std::cout << "get dir " << get_current_dir_name()<< "\n";
             ls(); //IF NO ARGS, PASS IN NOTHING
+            //AshellPrint("\n");
+            minipwd();
         }
 
     }
     else if(run_program[0] == 'p' && run_program[1] == 'w' && run_program[2] == 'd' && run_program[3] == '\0'){
-        std::cout <<"Execute PWD "<<"\n";
+        //std::cout <<"Execute PWD "<<"\n";
         pwd();
+        minipwd();
     }
     else if(run_program[0] == 'e' && run_program[1] == 'x' && run_program[2] == 'i' && run_program[3] == 't' && run_program[4] == '\0'){
-        std::cout <<"Execute EXIT "<<"\n";
+        //std::cout <<"Execute EXIT "<<"\n";
         exit();
     }
     else if(run_program[0] == 'f' && run_program[1] == 'f' && run_program[2] == '\0'){
@@ -769,11 +783,14 @@ void CallPrograms(char **seperated, int * metadata){
           AshellPrint("\n");
         }
         //ff(filename, dir,  newdir);
+        minipwd();
     }
     else{
         std::cout <<"\n"<<"Run Exec(" << run_program<<");" <<"\n";
         exec(seperated, metadata);
+
     }
+
 
 
 }
@@ -956,7 +973,9 @@ void ReadAndParseCmd() {
             for(int j = 0; j < num_chars + 1; ++j){
                 //std::cout <<prog[j - 1] <<"\n";
             }
+
             end_line = true;
+
         }
                 //ARROW CASE	*---
         else{
@@ -968,9 +987,11 @@ void ReadAndParseCmd() {
 
 
     }
+
     num_lines++;
     num_lines_tot++;	//keep track of total number of lines
     ResetCanonicalMode(STDIN_FILENO, &SavedTermAttributes); //reset canon mode
+
     parse(prog,&args); //Parse the program
 
 }
