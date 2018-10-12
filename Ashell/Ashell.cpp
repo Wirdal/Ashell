@@ -1020,7 +1020,6 @@ void ReadAndParseCmd() {
             AshellPrint("\b \b"); 	//outputs backspace
                         num_chars= num_chars - 2;
                         //std::cout <<"Passing in:  " <<"\n";
-
                         //std::cout<<num_chars; 					//corrects number of chars entered
             prog[num_chars] = char_read;	//replaces location in memory to backspace (maybe should be '\0'?)
         }
