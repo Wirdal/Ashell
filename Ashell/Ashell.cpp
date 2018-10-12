@@ -101,14 +101,11 @@ void minipwd(){
                 Use 1 as oldfd then
         then give it a filename.
         Then execute the command, and you should see the input accordingly
-
         If you're storing tokens in a vector, remember what I said in the CSIF
         You can iterate through that list till the index is to the second to last
         And call my fn on index, and index+1
         It should chain them all appropriatly.
-
         If you get any weirdness with executing things after that, it might this thing. I am unsure if it closes after use
-
         Sincerly
         Chase Maguire
         XOXOX
@@ -678,10 +675,15 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                 close(fd[READ_END]);		//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
 
                                 //if it is not one of the commands:
-                                //std::cout <<"execvp("  << seperated[0] << " " << *seperated << ")"<<"\n"; //if returns, error
-                                execvp(seperated[0], seperated);
+                                std::cout <<"execvp("  << seperated[0] << " " << *seperated << ")"<<"\n"; //if returns, error
+                                if(execvp(seperated[0], seperated)){
+                                    AshellPrint("Failed to execute ");
+                                    AshellPrint(seperated[0]);
+                                    AshellPrint("\n");
+                                    exit(EXIT_FAILURE);
+                                }
                                 //std::cout <<"FAILED TO  " <<"\n";
-                                exit(EXIT_FAILURE);		//https://stackoverflow.com/questions/13667364/exit-failure-vs-exit1
+                                                //https://stackoverflow.com/questions/13667364/exit-failure-vs-exit1
                                 //std::cout <<"END " <<"\n";
                                 //parent
                                                 //wait for it to finish
@@ -766,8 +768,6 @@ void CallPrograms(char **seperated, int * metadata, char * tokens){
         /*
         const char *file = "ff";
         const char *dir = "fftest";
-
-
         std::cout << "Chaning current dir " << get_current_dir_name()<< "\n";
         chdir(get_current_dir_name());
         std::vector<std::string> vec;
@@ -781,7 +781,6 @@ void CallPrograms(char **seperated, int * metadata, char * tokens){
         //format:
         //std::vector<std::string> ff(const char* filename, const char* directory, const char* newdir)
         //std::vector<std::string> ffemptdir(const char* filename, const char* newdir){\
-
 
         //std::cout << "Chaning current dir " << get_current_dir_name()<< "\n";
         dir = get_current_dir_name();
