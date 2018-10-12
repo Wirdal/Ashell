@@ -533,7 +533,6 @@ int exec(char ** seperated, int * metadata, char * tokens){
                         pid = fork(); //two process running
                         num_children++;
                         fd_old = 0;
-                        //std::cout <<"process ID  "  << pid <<"\n";
 
                         //child
                         //http://man7.org/linux/man-pages/man2/getpid.2.html
@@ -559,7 +558,9 @@ int exec(char ** seperated, int * metadata, char * tokens){
 
 
                                                 //return dup2(newfd, oldfd);
+
                                                 output = redir(0, newfile); //old fd, newfile
+
                                                 used_output = true;
                                         }
                                         if(i + 1 < num_args && tokens[i] == '<'){
@@ -608,7 +609,9 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                         }
                                         if(used_output){
                                                 //output = redir(STDOUT_FILENO, output)
+
                                                 dup2(output, STDOUT_FILENO);
+
                                                 close(output);
                                         }
 
@@ -645,6 +648,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
 
                 }
                 AshellPrint("\n");
+
                 //minipwd();
                 //OUTSIDE OF FOR
 
@@ -713,6 +717,7 @@ void CallPrograms(char **seperated, int * metadata, char * tokens){
     }
     else{
         exec(seperated, metadata,tokens);
+        //minipwd();
     }
 
 
