@@ -525,7 +525,7 @@ int size_of(char *array){
     return i;
 }
 int exec(char ** seperated, int * metadata, char * tokens){
-                std::cout <<"In exec  "  <<"\n";
+                //std::cout <<"In exec  "  <<"\n";
                 //std::cout <<"tokens:  "  <<tokens[1]<<"\n";
 
                 //std::cout <<"Meta:  "  << metadata<<"\n";
@@ -552,7 +552,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
                 int num_args = metadata[1] + 1; // this has to be +1
 
 \
-                std::cout <<"Meta:  "  << " splits: " << metadata[0]<< " args: " << metadata[1] << " pipes: " << metadata[2]<<" right: " << metadata[3]<<" left: " << metadata[4]<<" spaces: " << metadata[5]<<"\n";
+                //std::cout <<"Meta:  "  << " splits: " << metadata[0]<< " args: " << metadata[1] << " pipes: " << metadata[2]<<" right: " << metadata[3]<<" left: " << metadata[4]<<" spaces: " << metadata[5]<<"\n";
                 /*
                 for(int x = 0; x <num_seperated; x++){
                     std::cout <<"Seperated:  "  << num_seperated<<seperated[x]<<"\n";
@@ -560,15 +560,15 @@ int exec(char ** seperated, int * metadata, char * tokens){
                 */
 
 
-                std::cout <<"num_args:"  << num_args <<"\n";
+                //std::cout <<"num_args:"  << num_args <<"\n";
                 for(int i = 0; i < num_args; i++){
-                        std::cout <<"START FORK sep = "  << i <<"\n";
+                        //std::cout <<"START FORK sep = "  << i <<"\n";
                         int input;
                         int output;
 
                         //std::cout <<"process ID pre fork:  "  << pid <<"\n";
                         //https://www.geeksforgeeks.org/c-program-demonstrate-fork-and-pipe/
-                        std::cout <<"FORK"<<"\n";
+                        //std::cout <<"FORK"<<"\n";
                         pipe(fd);
                         pid = fork(); //two process running
                         num_children++;
@@ -578,7 +578,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
                         //child
                         //http://man7.org/linux/man-pages/man2/getpid.2.html
                         if(pid == -1){
-                                        std::cout <<"fork error "  << pid <<"\n";
+                                        //std::cout <<"fork error "  << pid <<"\n";
                                         //exit();
                         }
                         else if (pid == 0){
@@ -599,10 +599,10 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                         //chaining commands with chase's fn
                                         //i+1 is the next command
                                         if(i + 1 < num_args && tokens[i] == '>'){
-                                                std::cout <<"recognize > "<<"\n";
-                                                std::cout <<"sep[i + 1]: " <<seperated[i + 1] <<"\n";
+                                                //std::cout <<"recognize > "<<"\n";
+                                                //std::cout <<"sep[i + 1]: " <<seperated[i + 1] <<"\n";
                                                 const char* newfile = seperated[i + 1];
-                                                std::cout <<"new file: " << newfile <<"\n";
+                                                //std::cout <<"new file: " << newfile <<"\n";
 
                                                 //return dup2(newfd, oldfd);
                                                 output = redir(0, newfile); //old fd, newfile
@@ -610,9 +610,9 @@ int exec(char ** seperated, int * metadata, char * tokens){
                                         }
                                         if(i + 1 < num_args && tokens[i] == '<'){
 
-                                                std::cout <<"sep[i + 1]: " <<seperated[i + 1] <<"\n";
+                                                //std::cout <<"sep[i + 1]: " <<seperated[i + 1] <<"\n";
                                                 const char* newfile = seperated[i + 1];
-                                                std::cout <<"new file: " << newfile <<"\n";
+                                                //std::cout <<"new file: " << newfile <<"\n";
 
                                                 //return dup2(newfd, oldfd);
                                                 input = redir(0, newfile); //old fd, newfile
@@ -634,7 +634,7 @@ int exec(char ** seperated, int * metadata, char * tokens){
 
                                 if(num_children != num_args){
                                         //if its not a leaf child: output the childs output to STDOUT
-                                        std::cout <<"not leaf child"<<"\n";
+                                        //std::cout <<"not leaf child"<<"\n";
 
                                         //std::cout <<"NOT LEAF CHILD: " <<"\n";
                                         //const char* newfile = fd[WRITE_END];			//https://stackoverflow.com/questions/40565197/pipe-usage-in-c
@@ -957,7 +957,7 @@ void ReadAndParseCmd() {
 
         //EOT (end of transit) CASE *---
         if(0x04 == char_read){ // C-d
-            std::cout <<"its something else entirely..." << "\n";
+            //std::cout <<"its something else entirely..." << "\n";
             break;
         }
 
