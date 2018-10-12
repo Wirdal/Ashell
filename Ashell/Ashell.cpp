@@ -42,22 +42,22 @@ void AshellPrint(const char* output){
 //Write to 1 fir STDOUT_FILENO
 //Write to 2 for STDERR_FILENO
 //We're gonna write to 1, so we can print to the console
-	//Find how much we need to write
-	int size = strlen(output);
-	int written = 0;
-	while(size != written){
-		int current = write(1, output, 1);
-		written = written + current;
-		output = output + current;
-	};
+        //Find how much we need to write
+        int size = strlen(output);
+        int written = 0;
+        while(size != written){
+                int current = write(1, output, 1);
+                written = written + current;
+                output = output + current;
+        };
 };
 void AshellPrint(std::string output){
-	//I can't think of a better way to do this
-	AshellPrint(output.c_str());
+        //I can't think of a better way to do this
+        AshellPrint(output.c_str());
 };
 void AshellPrint(int output){
-	std::string out2 = std::to_string(output);
-	AshellPrint(out2.c_str());
+        std::string out2 = std::to_string(output);
+        AshellPrint(out2.c_str());
 };
 
 size_t AshellRead(int fd, void *buf, size_t count){
@@ -71,10 +71,10 @@ int AshellOpen(const char *path, int flags, .../*, mode_t mode*/){
 
 
 void pwd(){
-	char *path = get_current_dir_name();
-	AshellPrint(path);
-	free(path);
-	AshellPrint("\n");
+        char *path = get_current_dir_name();
+        AshellPrint(path);
+        free(path);
+        AshellPrint("\n");
 };
 void minipwd(){
   // Acts as the first thing pritned out, before parsing happens
@@ -94,29 +94,29 @@ void minipwd(){
   }
 }
 /*
-	To Benjamin
-	Here is how this function works
-	You supply it the file descriptor of something
-		If you dont have a FD, you're probably parsing a command first
-		Use 1 as oldfd then
-	then give it a filename.
-	Then execute the command, and you should see the input accordingly
+        To Benjamin
+        Here is how this function works
+        You supply it the file descriptor of something
+                If you dont have a FD, you're probably parsing a command first
+                Use 1 as oldfd then
+        then give it a filename.
+        Then execute the command, and you should see the input accordingly
 
-	If you're storing tokens in a vector, remember what I said in the CSIF
-	You can iterate through that list till the index is to the second to last
-	And call my fn on index, and index+1
-	It should chain them all appropriatly.
+        If you're storing tokens in a vector, remember what I said in the CSIF
+        You can iterate through that list till the index is to the second to last
+        And call my fn on index, and index+1
+        It should chain them all appropriatly.
 
-	If you get any weirdness with executing things after that, it might this thing. I am unsure if it closes after use
+        If you get any weirdness with executing things after that, it might this thing. I am unsure if it closes after use
 
-	Sincerly
-	Chase Maguire
-	XOXOX
+        Sincerly
+        Chase Maguire
+        XOXOX
 */
 int redir(int oldfd, const char* newfile){
 
-	int newfd = open(newfile, O_CREAT|O_WRONLY|O_TRUNC);
-	return dup2(newfd, oldfd);
+        int newfd = open(newfile, O_CREAT|O_WRONLY|O_TRUNC);
+        return dup2(newfd, oldfd);
 }
 
 //Not sure if this is overloading or accidental inclusion - Ben
@@ -127,22 +127,22 @@ int readir(std::string oldfile, const char*newfile){
 
 
 void exit(){
-	exit(EXIT_SUCCESS);
+        exit(EXIT_SUCCESS);
 };
 
 void cd(const char* directory){
-	int err = chdir(directory);
-	if (-1 == err){
-		AshellPrint("Error changing directory \n");
-	}
+        int err = chdir(directory);
+        if (-1 == err){
+                AshellPrint("Error changing directory \n");
+        }
 };
 void cd(std::string directory){
-	const char* cdirectory = directory.c_str();
-	int err = chdir(cdirectory);
-	if (-1 == err){
-		AshellPrint("Error changing directory \n");
+        const char* cdirectory = directory.c_str();
+        int err = chdir(cdirectory);
+        if (-1 == err){
+                AshellPrint("Error changing directory \n");
 
-	}
+        }
 };
 
 
@@ -154,77 +154,77 @@ void ls(const char* directory){
   struct dirent *entry;
   dir = opendir(directory);
   if (NULL != dir){
-	   entry = readdir(dir);
-	// Set the buffer for stat here
-	   struct stat statbuff; //I think segfaults happen here?
-  	while (NULL != entry){
-  		stat(entry->d_name, &statbuff);
-  		if (S_ISDIR(statbuff.st_mode)){
-  			AshellPrint("d");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IRUSR) {
-  			AshellPrint("r");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IWUSR) {
-  			AshellPrint("w");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IXUSR) {
-  			AshellPrint("x");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IRGRP) {
-  			AshellPrint("r");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IWGRP) {
-  			AshellPrint("w");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IXGRP) {
-  			AshellPrint("x");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IROTH) {
-  			AshellPrint("r");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IWOTH) {
-  			AshellPrint("w");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IXOTH) {
-  			AshellPrint("w");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		AshellPrint(" ");
-  		AshellPrint(entry->d_name);
-  		AshellPrint("\n");
-  		entry = readdir(dir);
+           entry = readdir(dir);
+        // Set the buffer for stat here
+           struct stat statbuff; //I think segfaults happen here?
+        while (NULL != entry){
+                stat(entry->d_name, &statbuff);
+                if (S_ISDIR(statbuff.st_mode)){
+                        AshellPrint("d");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IRUSR) {
+                        AshellPrint("r");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IWUSR) {
+                        AshellPrint("w");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IXUSR) {
+                        AshellPrint("x");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IRGRP) {
+                        AshellPrint("r");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IWGRP) {
+                        AshellPrint("w");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IXGRP) {
+                        AshellPrint("x");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IROTH) {
+                        AshellPrint("r");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IWOTH) {
+                        AshellPrint("w");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IXOTH) {
+                        AshellPrint("w");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                AshellPrint(" ");
+                AshellPrint(entry->d_name);
+                AshellPrint("\n");
+                entry = readdir(dir);
 
-  	}
+        }
   }
 };
 
@@ -234,76 +234,76 @@ void ls(std::string directory){
   struct dirent *entry;
   dir = opendir(directory.c_str());
   if (NULL != dir){
-  	entry = readdir(dir);
-  	struct stat statbuff; //I think segfaults happen here?
-  	while (NULL != entry){
-  		stat(entry->d_name, &statbuff);
-  		if (S_ISDIR(statbuff.st_mode)){
-  			AshellPrint("d");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IRUSR) {
-  			AshellPrint("r");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IWUSR) {
-  			AshellPrint("w");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IXUSR) {
-  			AshellPrint("x");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IRGRP) {
-  			AshellPrint("r");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IWGRP) {
-  			AshellPrint("w");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IXGRP) {
-  			AshellPrint("x");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IROTH) {
-  			AshellPrint("r");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IWOTH) {
-  			AshellPrint("w");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IXOTH) {
-  			AshellPrint("w");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		AshellPrint(" ");
-  		AshellPrint(entry->d_name);
-  		AshellPrint("\n");
-  		entry = readdir(dir);
+        entry = readdir(dir);
+        struct stat statbuff; //I think segfaults happen here?
+        while (NULL != entry){
+                stat(entry->d_name, &statbuff);
+                if (S_ISDIR(statbuff.st_mode)){
+                        AshellPrint("d");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IRUSR) {
+                        AshellPrint("r");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IWUSR) {
+                        AshellPrint("w");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IXUSR) {
+                        AshellPrint("x");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IRGRP) {
+                        AshellPrint("r");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IWGRP) {
+                        AshellPrint("w");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IXGRP) {
+                        AshellPrint("x");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IROTH) {
+                        AshellPrint("r");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IWOTH) {
+                        AshellPrint("w");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IXOTH) {
+                        AshellPrint("w");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                AshellPrint(" ");
+                AshellPrint(entry->d_name);
+                AshellPrint("\n");
+                entry = readdir(dir);
 
-  	}
+        }
   }
 };
 
@@ -313,195 +313,195 @@ void ls(){
   struct dirent *entry;
   dir = opendir(get_current_dir_name());
   if (NULL != dir){
-  	entry = readdir(dir);
-  	// Set the buffer for stat here
-  	struct stat statbuff; //I think segfaults happen here?
-  	while (NULL != entry){
-  		stat(entry->d_name, &statbuff);
-  		if (S_ISDIR(statbuff.st_mode)){
-  			AshellPrint("d");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IRUSR) {
-  			AshellPrint("r");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IWUSR) {
-  			AshellPrint("w");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IXUSR) {
-  			AshellPrint("x");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IRGRP) {
-  			AshellPrint("r");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IWGRP) {
-  			AshellPrint("w");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IXGRP) {
-  			AshellPrint("x");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IROTH) {
-  			AshellPrint("r");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IWOTH) {
-  			AshellPrint("w");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		if (statbuff.st_mode & S_IXOTH) {
-  			AshellPrint("w");
-  		}
-  		else {
-  			AshellPrint("-");
-  		}
-  		AshellPrint(" ");
-  		AshellPrint(entry->d_name);
-  		AshellPrint("\n");
-  		entry = readdir(dir);
+        entry = readdir(dir);
+        // Set the buffer for stat here
+        struct stat statbuff; //I think segfaults happen here?
+        while (NULL != entry){
+                stat(entry->d_name, &statbuff);
+                if (S_ISDIR(statbuff.st_mode)){
+                        AshellPrint("d");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IRUSR) {
+                        AshellPrint("r");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IWUSR) {
+                        AshellPrint("w");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IXUSR) {
+                        AshellPrint("x");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IRGRP) {
+                        AshellPrint("r");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IWGRP) {
+                        AshellPrint("w");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IXGRP) {
+                        AshellPrint("x");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IROTH) {
+                        AshellPrint("r");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IWOTH) {
+                        AshellPrint("w");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                if (statbuff.st_mode & S_IXOTH) {
+                        AshellPrint("w");
+                }
+                else {
+                        AshellPrint("-");
+                }
+                AshellPrint(" ");
+                AshellPrint(entry->d_name);
+                AshellPrint("\n");
+                entry = readdir(dir);
 
-  	}
+        }
   }
 };
 
 std::vector<std::string> ff(const char* filename, const char* directory, const char* newdir){
-	std::vector<std::string> vec;
-  	DIR* dir;
-  	struct dirent *entry;
-  	struct stat statbuff;
-	// Start by opening the directory that we're at, or attempting to
-	if (NULL != newdir){
-		chdir(newdir);
-	}
-	else {
-		if (chdir(directory)==-1){
-			AshellPrint("Error changing directory \n");
-			return vec;
-		}
-	}
-	//Open the directory
-	dir = opendir(get_current_dir_name());
-	//Start reading from it
-	entry = readdir(dir);
-	while (entry != NULL){ //So long as we have read something
-		stat(entry->d_name, &statbuff);
-		if (0==strcmp(filename, entry->d_name)){
-			//Add it to vector?
-			std::string slash = "/";
-			std::string fileloc;
-			if (newdir == NULL){
-				fileloc = directory + slash + filename;
-			}
-			else{
-				fileloc = directory + slash + newdir +slash + filename;
-			}
-			vec.push_back(fileloc);
-			entry = readdir(dir);
-		}
-		else if ((0 == strcmp(".", entry->d_name)) ||(0 == strcmp("..", entry->d_name))){
-			entry = readdir(dir); //Read the next entry
-		}
-		else if (S_ISDIR(statbuff.st_mode)){
-			const char* saveddir = get_current_dir_name();
-			if (chdir(entry->d_name)==-1){
-				//Can't open the file
-			}
-			else{
-				//Open it, and check what happens
-				std::vector <std::string> retvec = ff(filename, directory, entry->d_name);
-				for(int i=0; i<retvec.size(); ++i){
-					vec.push_back(retvec[i]);
-				}
-			}
-			chdir(saveddir);
-			entry = readdir(dir);
-		}
-		else{
-			entry = readdir(dir);
-		}
-	}
+        std::vector<std::string> vec;
+        DIR* dir;
+        struct dirent *entry;
+        struct stat statbuff;
+        // Start by opening the directory that we're at, or attempting to
+        if (NULL != newdir){
+                chdir(newdir);
+        }
+        else {
+                if (chdir(directory)==-1){
+                        AshellPrint("Error changing directory \n");
+                        return vec;
+                }
+        }
+        //Open the directory
+        dir = opendir(get_current_dir_name());
+        //Start reading from it
+        entry = readdir(dir);
+        while (entry != NULL){ //So long as we have read something
+                stat(entry->d_name, &statbuff);
+                if (0==strcmp(filename, entry->d_name)){
+                        //Add it to vector?
+                        std::string slash = "/";
+                        std::string fileloc;
+                        if (newdir == NULL){
+                                fileloc = directory + slash + filename;
+                        }
+                        else{
+                                fileloc = directory + slash + newdir +slash + filename;
+                        }
+                        vec.push_back(fileloc);
+                        entry = readdir(dir);
+                }
+                else if ((0 == strcmp(".", entry->d_name)) ||(0 == strcmp("..", entry->d_name))){
+                        entry = readdir(dir); //Read the next entry
+                }
+                else if (S_ISDIR(statbuff.st_mode)){
+                        const char* saveddir = get_current_dir_name();
+                        if (chdir(entry->d_name)==-1){
+                                //Can't open the file
+                        }
+                        else{
+                                //Open it, and check what happens
+                                std::vector <std::string> retvec = ff(filename, directory, entry->d_name);
+                                for(int i=0; i<retvec.size(); ++i){
+                                        vec.push_back(retvec[i]);
+                                }
+                        }
+                        chdir(saveddir);
+                        entry = readdir(dir);
+                }
+                else{
+                        entry = readdir(dir);
+                }
+        }
 
-	// Should now be in the proper directory, or have returned by now
-	return vec;
+        // Should now be in the proper directory, or have returned by now
+        return vec;
 };
 
 std::vector<std::string> ffemptdir(const char* filename, const char* newdir){
-	//Should be very similair, except we need to change to whatever the local dir is
-	std::vector<std::string> vec;
-  	DIR* dir;
-  	struct dirent *entry;
-  	struct stat statbuff;
-	// Start by opening the directory that we're at, or attempting to
-	if (NULL != newdir){
-		chdir(newdir);
-	}
-	//Open the directory
-	dir = opendir(get_current_dir_name());
-	//Start reading from it
-	entry = readdir(dir);
-	while (entry != NULL){ //So long as we have read something
-		stat(entry->d_name, &statbuff);
-		if (0==strcmp(filename, entry->d_name)){
-			//Add it to vector?
-			std::string slash = "/";
-			std::string fileloc;
-			if (newdir == NULL){
-				fileloc = "." + slash + filename;
-			}
-			else{
-				fileloc = "." + slash + newdir +slash + filename;
-			}
-			vec.push_back(fileloc);
-			entry = readdir(dir);
-		}
-		else if ((0 == strcmp(".", entry->d_name)) ||(0 == strcmp("..", entry->d_name))){
-			entry = readdir(dir); //Read the next entry
-		}
-		else if (S_ISDIR(statbuff.st_mode)){
-			const char* saveddir = get_current_dir_name();
-			if (chdir(entry->d_name)==-1){
-				//Can't open the file
-			}
-			else{
-				//Open it, and check what happens
-				std::vector <std::string> retvec = ffemptdir(filename, entry->d_name);
-				for(int i=0; i<retvec.size(); ++i){
-					vec.push_back(retvec[i]);
-				}
-			}
-			chdir(saveddir);
-			entry = readdir(dir);
-		}
-		else{
-			entry = readdir(dir);
-		}
-	}
+        //Should be very similair, except we need to change to whatever the local dir is
+        std::vector<std::string> vec;
+        DIR* dir;
+        struct dirent *entry;
+        struct stat statbuff;
+        // Start by opening the directory that we're at, or attempting to
+        if (NULL != newdir){
+                chdir(newdir);
+        }
+        //Open the directory
+        dir = opendir(get_current_dir_name());
+        //Start reading from it
+        entry = readdir(dir);
+        while (entry != NULL){ //So long as we have read something
+                stat(entry->d_name, &statbuff);
+                if (0==strcmp(filename, entry->d_name)){
+                        //Add it to vector?
+                        std::string slash = "/";
+                        std::string fileloc;
+                        if (newdir == NULL){
+                                fileloc = "." + slash + filename;
+                        }
+                        else{
+                                fileloc = "." + slash + newdir +slash + filename;
+                        }
+                        vec.push_back(fileloc);
+                        entry = readdir(dir);
+                }
+                else if ((0 == strcmp(".", entry->d_name)) ||(0 == strcmp("..", entry->d_name))){
+                        entry = readdir(dir); //Read the next entry
+                }
+                else if (S_ISDIR(statbuff.st_mode)){
+                        const char* saveddir = get_current_dir_name();
+                        if (chdir(entry->d_name)==-1){
+                                //Can't open the file
+                        }
+                        else{
+                                //Open it, and check what happens
+                                std::vector <std::string> retvec = ffemptdir(filename, entry->d_name);
+                                for(int i=0; i<retvec.size(); ++i){
+                                        vec.push_back(retvec[i]);
+                                }
+                        }
+                        chdir(saveddir);
+                        entry = readdir(dir);
+                }
+                else{
+                        entry = readdir(dir);
+                }
+        }
 
-	// Should now be in the proper directory, or have returned by now
-	return vec;
+        // Should now be in the proper directory, or have returned by now
+        return vec;
 };
 
 //convert a string
@@ -518,8 +518,9 @@ int size_of(char *array){
     }
     return i;
 }
-int exec(char ** seperated, int * metadata){
-                //std::cout <<"In exec  "  <<"\n";
+int exec(char ** seperated, int * metadata, char * tokens){
+                std::cout <<"In exec  "  <<"\n";
+                //std::cout <<"tokens:  "  <<tokens[1]<<"\n";
 
                 //std::cout <<"Meta:  "  << metadata<<"\n";
                 pid_t pid;
@@ -555,6 +556,7 @@ int exec(char ** seperated, int * metadata){
 
 
                 for(int i = 0; i < num_seperated; i++){
+                        std::cout <<"START FORK sep = "  << i <<"\n";
                         int input;
                         int output;
 
@@ -588,20 +590,21 @@ int exec(char ** seperated, int * metadata){
                                         dup2(fd_old, 0); //old fd and new fd, new fd dup2 creates a copy, old fd in
 
                                         //chaining commands with chase's fn
-                                        if(i + 1 < num_seperated && seperated[i + 1] == ">"){
+                                        //i+1 is the next command
+                                        if(i + 1 < num_seperated && tokens[i] == '>'){
                                                 std::cout <<"recognize > "<<"\n";
-                                                std::cout <<"sep[i + 2]: " <<seperated[i + 2] <<"\n";
-                                                const char* newfile = seperated[i + 2];
+                                                std::cout <<"sep[i + 1]: " <<seperated[i + 1] <<"\n";
+                                                const char* newfile = seperated[i + 1];
                                                 std::cout <<"new file: " << newfile <<"\n";
 
                                                 //return dup2(newfd, oldfd);
                                                 output = redir(0, newfile); //old fd, newfile
                                                 used_output = true;
                                         }
-                                        if(i + 1 < num_seperated && seperated[i + 1] == "<"){
+                                        if(i + 1 < num_seperated && tokens[i] == '<'){
 
-                                                std::cout <<"sep[i + 2]: " <<seperated[i + 2] <<"\n";
-                                                const char* newfile = seperated[i + 2];
+                                                std::cout <<"sep[i + 1]: " <<seperated[i + 1] <<"\n";
+                                                const char* newfile = seperated[i + 1];
                                                 std::cout <<"new file: " << newfile <<"\n";
 
                                                 //return dup2(newfd, oldfd);
@@ -609,10 +612,10 @@ int exec(char ** seperated, int * metadata){
                                                 //check if input == -1
                                                 used_input = true;
                                         }
-                                        if(i + 3 < num_seperated && seperated[i + 3] == ">"){
+                                        if(i + 2 < num_seperated && tokens[i + 1] == '>'){
 
-                                                std::cout <<"sep[i + 2]: " <<seperated[i + 4] <<"\n";
-                                                const char* newfile = seperated[i + 4];
+                                                std::cout <<"sep[i + 2]: " <<seperated[i + 2] <<"\n";
+                                                const char* newfile = seperated[i + 2];
                                                 std::cout <<"new file: " << newfile <<"\n";
 
                                                 //return dup2(newfd, oldfd);
@@ -701,9 +704,9 @@ int exec(char ** seperated, int * metadata){
 
 
 }
-void CallPrograms(char **seperated, int * metadata){
+void CallPrograms(char **seperated, int * metadata, char * tokens){
     char * run_program = seperated[0]; //the first argument is the program to run
-
+    //std::cout <<"tok in callprog: "<< tokens <<"\n";
     //wrong - metadata[0] = num_args+1;
     int num_args = metadata[0] - 1; //this is actually num of splits
 
@@ -797,7 +800,8 @@ void CallPrograms(char **seperated, int * metadata){
     }
     else{
         std::cout <<"\n"<<"Run Exec(" << run_program<<");" <<"\n";
-        exec(seperated, metadata);
+        //std::cout <<"tok in pre exec: "<< tokens <<"\n";
+        exec(seperated, metadata,tokens);
 
     }
 
@@ -890,8 +894,8 @@ void parse(char *prog, char **parsed){
     char * run_program = seperated[0];
     metadata[0] = i -1;
     //std::cout <<"\n"<<"num_splits: " << i <<"\n";
-
-    CallPrograms(seperated, metadata);
+    //std::cout <<"tok Call: "<<tokens[1] <<"\n";
+    CallPrograms(seperated, metadata, tokens);
 }
 
 void ReadAndParseCmd() {
